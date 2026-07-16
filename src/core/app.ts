@@ -40,7 +40,9 @@ export class App {
     this.renderer.setClearColor(0xe8ecf1, 1);
 
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.Fog(0xe8ecf1, 60, 185);
+    // Far range so the tower stays crisp even when pulled back for the phone
+    // portrait framing (dist ~104); landscape (front ~36) is unaffected.
+    this.scene.fog = new THREE.Fog(0xe8ecf1, 90, 340);
 
     this.camera = new THREE.PerspectiveCamera(50, 1, 0.1, 500);
     this.camera.position.set(0, 34, 82);

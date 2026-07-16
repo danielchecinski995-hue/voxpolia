@@ -285,8 +285,13 @@ export class LiveBuilding {
   private driveCamera(dt: number, elapsed: number, camera: THREE.PerspectiveCamera): void {
     // No auto-spin: the building only turns while a rotate button is held.
     this.orbit += this.rotDir * ROTATE_SPEED * dt;
-    const dist = 66;
-    const camY = this.center.y + 4;
+    // Phone portrait: stack the tower UNDER the hero copy (centered, in the
+    // lower half) instead of beside it — pull back and aim high so the whole
+    // building drops into the bottom of the frame. Landscape keeps it on the
+    // right, clear of the text.
+    const portrait = window.innerWidth <= 720;
+    const dist = portrait ? 104 : 66;
+    const camY = portrait ? this.center.y + 2 : this.center.y + 4;
     let sx = 0; let sy = 0;
     if (this.shake > 0) {
       this.shake = Math.max(0, this.shake - dt * 2.2);
@@ -299,10 +304,15 @@ export class LiveBuilding {
       camY + sy,
       this.center.z + Math.cos(this.orbit) * dist,
     );
-    // Pan the tower further RIGHT (≈ +15% vs before) so it clears the hero copy.
-    _fwd.subVectors(this.center, camera.position).normalize();
-    _right.crossVectors(_fwd, _up).normalize();
-    _look.copy(this.center).addScaledVector(_right, -24);
+    if (portrait) {
+      // Horizontally centered; aim well above center so the tower sits low.
+      _look.set(this.center.x, this.center.y * 1.85, this.center.z);
+    } else {
+      // Pan the tower further RIGHT so it clears the hero copy.
+      _fwd.subVectors(this.center, camera.position).normalize();
+      _right.crossVectors(_fwd, _up).normalize();
+      _look.copy(this.center).addScaledVector(_right, -24);
+    }
     camera.lookAt(_look);
   }
 }

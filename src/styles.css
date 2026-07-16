@@ -622,6 +622,10 @@ main { position: relative; z-index: 1; }
   .nav { gap: 0.75rem; }
   .brand-name { display: none; }
   .nav a { font-size: 0.85rem; }
+  /* Phone: hero copy pinned to the top, the 3D tower sits UNDER it (the scene
+     re-frames the building into the lower half — see liveBuilding portrait). */
+  .hero { justify-content: flex-start; padding-top: 5.5rem; }
+  .hero-inner { max-width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
