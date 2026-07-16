@@ -290,8 +290,10 @@ export class LiveBuilding {
     // building drops into the bottom of the frame. Landscape keeps it on the
     // right, clear of the text.
     const portrait = window.innerWidth <= 720;
-    const dist = portrait ? 104 : 66;
-    const camY = portrait ? this.center.y + 2 : this.center.y + 4;
+    // Portrait: pull back so the WHOLE tower is small enough to leave margins
+    // above (hero copy) and below (controls) — nothing overlaps it.
+    const dist = portrait ? 150 : 66;
+    const camY = portrait ? this.center.y + 6 : this.center.y + 4;
     let sx = 0; let sy = 0;
     if (this.shake > 0) {
       this.shake = Math.max(0, this.shake - dt * 2.2);
@@ -305,8 +307,9 @@ export class LiveBuilding {
       this.center.z + Math.cos(this.orbit) * dist,
     );
     if (portrait) {
-      // Horizontally centered; aim well above center so the tower sits low.
-      _look.set(this.center.x, this.center.y * 1.85, this.center.z);
+      // Horizontally centered; aim above center so the tower sits in the lower
+      // band with a gap under the hero copy and footroom above the controls.
+      _look.set(this.center.x, this.center.y * 1.7, this.center.z);
     } else {
       // Pan the tower further RIGHT so it clears the hero copy.
       _fwd.subVectors(this.center, camera.position).normalize();

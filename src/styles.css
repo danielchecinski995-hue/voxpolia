@@ -626,6 +626,17 @@ main { position: relative; z-index: 1; }
      re-frames the building into the lower half — see liveBuilding portrait). */
   .hero { justify-content: flex-start; padding-top: 5.5rem; }
   .hero-inner { max-width: 100%; }
+  /* Smaller controls, tucked to the very bottom so they clear the tower. */
+  .rotate-controls { bottom: 1.1rem; gap: 0.5rem; }
+  .rot-btn { width: 38px; height: 38px; font-size: 0.85rem; }
+  .reset-btn { padding: 0.4rem 0.85rem; font-size: 0.66rem; }
+  .rot-hint { font-size: 0.64rem; }
+  .scrollhint { display: none; } /* would collide with the controls */
+
+  /* Light scroll lock: the hero softly snaps into place, so it's a bit harder
+     to scroll off the building while playing with it (proximity = gentle). */
+  html { scroll-snap-type: y proximity; }
+  .hero { scroll-snap-align: start; }
 }
 
 @media (prefers-reduced-motion: reduce) {
