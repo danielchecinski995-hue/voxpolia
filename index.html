@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Voxpolia — Voxel Destruction</title>
+    <meta
+      name="description"
+      content="Voxpolia — wokselowa strzelanka o burzeniu miasta. Prawdziwa fizyka zawaleń, arsenał broni, gra w przeglądarce. Voxel demolition shooter with real collapse physics."
+    />
+    <meta name="theme-color" content="#f5f1ea" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Voxpolia — Voxel Destruction" />
+    <meta property="og:description" content="Zrównaj miasto z ziemią. Wokselowa destrukcja z prawdziwą fizyką — gra w przeglądarce." />
+    <meta property="og:site_name" content="Voxpolia" />
+
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <!-- 3D canvas — the game's real tower under fire; decorative, hidden from a11y. -->
+    <canvas id="stage" aria-hidden="true"></canvas>
+
+    <!-- Shown while the tower is being built. -->
+    <div id="loader" aria-hidden="true">
+      <span class="loader-spin"></span>
+      <span class="loader-text">Voxpolia</span>
+    </div>
+
+    <header class="topbar" id="topbar">
+      <a class="brand" href="#hero" aria-label="Voxpolia — start">
+        <span class="brand-mono">ES11</span>
+        <span class="brand-name">Voxpolia</span>
+      </a>
+      <nav class="nav" aria-label="Główna nawigacja">
+        <a href="#game" data-i18n="nav.game">Gra</a>
+        <a href="#arsenal" data-i18n="nav.arsenal">Arsenał</a>
+        <a href="#full" data-i18n="nav.full">Pełna gra</a>
+        <a href="#studio" data-i18n="nav.studio">Studio</a>
+        <a href="#contact" data-i18n="nav.contact">Kontakt</a>
+        <span class="lang-toggle" role="group" aria-label="Język / Language">
+          <button type="button" class="lang-btn" data-lang="pl">PL</button>
+          <button type="button" class="lang-btn" data-lang="en">EN</button>
+        </span>
+      </nav>
+    </header>
+
+    <main>
+      <!-- HERO ─────────────────────────────────────────────────────────── -->
+      <section class="hero" id="hero">
+        <div class="hero-inner">
+          <p class="eyebrow" data-i18n="hero.eyebrow">Voxpolia · Voxel Destruction</p>
+          <h1 class="hero-title" data-i18n="hero.title" data-i18n-html>
+            Zrównaj miasto<br /><span class="accent">z ziemią.</span>
+          </h1>
+          <p class="hero-sub" data-i18n="hero.sub" data-i18n-html>
+            To nie animacja — to prawdziwa fizyka zawaleń.
+            <strong>Wyceluj myszką i kliknij — poleci rakieta.</strong>
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#game" data-i18n="hero.cta1">Zagraj w demo</a>
+            <a class="btn btn-ghost" href="#arsenal" data-i18n="hero.cta2">Zobacz arsenał</a>
+          </div>
+        </div>
+        <div class="rotate-controls">
+          <button id="btn-reset" class="reset-btn" type="button" data-i18n="hero.reset">⟳ Reset budynku</button>
+          <div class="rotate-row">
+            <button id="rot-left" class="rot-btn" type="button" data-i18n-aria="aria.rotLeft" aria-label="Obróć budynek w lewo">◀</button>
+            <span class="rot-hint" data-i18n="hero.rotate">obróć</span>
+            <button id="rot-right" class="rot-btn" type="button" data-i18n-aria="aria.rotRight" aria-label="Obróć budynek w prawo">▶</button>
+          </div>
+        </div>
+
+        <p class="scrollhint" aria-hidden="true" data-i18n="hero.scroll">przewiń ↓</p>
+      </section>
+
+      <!-- GAME / FEATURES ─────────────────────────────────────────────── -->
+      <section class="section" id="game">
+        <div class="wrap">
+          <p class="kicker reveal" data-i18n="game.kicker">O grze</p>
+          <h2 class="h2 reveal" data-i18n="game.h2">Każdy budynek naprawdę się wali</h2>
+          <p class="lead reveal" data-i18n="game.lead">
+            Voxpolia to wokselowa strzelanka o burzeniu miasta. Wybij ścianę nośną, a
+            wszystko nad nią runie kaskadą — sekcja po sekcji, aż na ziemię.
+          </p>
+          <ul class="features reveal" role="list">
+            <li data-i18n="game.f1">Zawalenia oparte na realnym modelu konstrukcji</li>
+            <li data-i18n="game.f2">Całe miasto do zrównania z ziemią</li>
+            <li data-i18n="game.f3">Arsenał, który zmienia sposób burzenia</li>
+            <li data-i18n="game.f4">Graj w przeglądarce — bez instalacji</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ARSENAL ─────────────────────────────────────────────────────── -->
+      <section class="section section--arsenal" id="arsenal">
+        <div class="wrap">
+          <p class="kicker reveal" data-i18n="arsenal.kicker">Arsenał</p>
+          <h2 class="h2 reveal" data-i18n="arsenal.h2">Czym burzysz w demie</h2>
+          <p class="lead reveal" data-i18n="arsenal.lead">
+            Trzy narzędzia zniszczenia, każde z własnym stylem.
+          </p>
+
+          <ul class="weapons" role="list">
+            <li class="weapon reveal">
+              <div class="weapon-stage">
+                <canvas class="weapon-canvas" data-model="models/rocket.glb" aria-label="Model 3D: Bazooka"></canvas>
+                <span class="weapon-hint" data-i18n="wpn.drag">przeciągnij, aby obrócić</span>
+              </div>
+              <div class="weapon-body">
+                <span class="weapon-tier" data-i18n="wpn.bazooka.tier">Poziomy 1–3</span>
+                <h3 class="weapon-name" data-i18n="wpn.bazooka.name">Bazooka</h3>
+                <p class="weapon-desc" data-i18n="wpn.bazooka.desc">
+                  Pojedynczy pocisk, ogromny krater.
+                </p>
+                <div class="wstats">
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.power">Siła</span><span class="wstat-bar" data-fill="5"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.radius">Promień</span><span class="wstat-bar" data-fill="5"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.rate">Tempo ognia</span><span class="wstat-bar" data-fill="2"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.precision">Precyzja</span><span class="wstat-bar" data-fill="3"></span></div>
+                </div>
+              </div>
+            </li>
+
+            <li class="weapon reveal">
+              <div class="weapon-stage">
+                <canvas class="weapon-canvas" data-model="models/minigun.glb" aria-label="Model 3D: Gatling"></canvas>
+                <span class="weapon-hint" data-i18n="wpn.drag">przeciągnij, aby obrócić</span>
+              </div>
+              <div class="weapon-body">
+                <span class="weapon-tier" data-i18n="wpn.gatling.tier">Poziomy 1–2</span>
+                <h3 class="weapon-name" data-i18n="wpn.gatling.name">Gatling</h3>
+                <p class="weapon-desc" data-i18n="wpn.gatling.desc">
+                  Grad pocisków, który wygryza konstrukcję.
+                </p>
+                <div class="wstats">
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.power">Siła</span><span class="wstat-bar" data-fill="2"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.radius">Promień</span><span class="wstat-bar" data-fill="1"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.rate">Tempo ognia</span><span class="wstat-bar" data-fill="5"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.precision">Precyzja</span><span class="wstat-bar" data-fill="4"></span></div>
+                </div>
+              </div>
+            </li>
+
+            <li class="weapon reveal">
+              <div class="weapon-stage">
+                <canvas class="weapon-canvas" data-model="models/c4.glb" aria-label="Model 3D: C4"></canvas>
+                <span class="weapon-hint" data-i18n="wpn.drag">przeciągnij, aby obrócić</span>
+              </div>
+              <div class="weapon-body">
+                <span class="weapon-tier" data-i18n="wpn.c4.tier">Ładunek kierowany</span>
+                <h3 class="weapon-name" data-i18n="wpn.c4.name">C4</h3>
+                <p class="weapon-desc" data-i18n="wpn.c4.desc">
+                  Podłóż ładunek dokładnie tam, gdzie chcesz.
+                </p>
+                <div class="wstats">
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.power">Siła</span><span class="wstat-bar" data-fill="5"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.radius">Promień</span><span class="wstat-bar" data-fill="4"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.rate">Tempo ognia</span><span class="wstat-bar" data-fill="1"></span></div>
+                  <div class="wstat"><span class="wstat-label" data-i18n="stat.precision">Precyzja</span><span class="wstat-bar" data-fill="5"></span></div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- FULL GAME ────────────────────────────────────────────────────── -->
+      <section class="section section--full" id="full">
+        <div class="wrap">
+          <p class="kicker reveal" data-i18n="full.kicker">W pełnej grze</p>
+          <h2 class="h2 reveal" data-i18n="full.h2">Demo to dopiero pierwsza dzielnica</h2>
+          <p class="lead reveal" data-i18n="full.lead">
+            To, co burzysz teraz, to wycinek świata Voxpolii.
+          </p>
+
+          <ul class="teasers" role="list">
+            <li class="teaser reveal">
+              <span class="teaser-glyph teaser-glyph--city" aria-hidden="true"></span>
+              <h3 class="teaser-title" data-i18n="full.i1.t">Całe miasto</h3>
+              <p class="teaser-desc" data-i18n="full.i1.d">Kolejne dzielnice, każda z własną sylwetką.</p>
+            </li>
+            <li class="teaser reveal">
+              <span class="teaser-glyph teaser-glyph--arsenal" aria-hidden="true"></span>
+              <h3 class="teaser-title" data-i18n="full.i2.t">Więcej broni</h3>
+              <p class="teaser-desc" data-i18n="full.i2.d">Nowe narzędzia zniszczenia poza demem.</p>
+            </li>
+            <li class="teaser reveal">
+              <span class="teaser-glyph teaser-glyph--coop" aria-hidden="true"></span>
+              <h3 class="teaser-title" data-i18n="full.i3.t">Co-op i multiplayer</h3>
+              <p class="teaser-desc" data-i18n="full.i3.d">Burz miasto z ekipą.</p>
+            </li>
+            <li class="teaser reveal">
+              <span class="teaser-glyph teaser-glyph--goal" aria-hidden="true"></span>
+              <h3 class="teaser-title" data-i18n="full.i4.t">Wyzwania i cele</h3>
+              <p class="teaser-desc" data-i18n="full.i4.d">Rundy na czas i wynik za styl.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- STUDIO ───────────────────────────────────────────────────────── -->
+      <section class="section" id="studio">
+        <div class="wrap studio-grid">
+          <div>
+            <p class="kicker reveal" data-i18n="studio.kicker">Studio</p>
+            <h2 class="h2 reveal" data-i18n="studio.h2">Kto to robi</h2>
+          </div>
+          <div class="studio-body reveal">
+            <p data-i18n="studio.body" data-i18n-html>
+              <strong>Endstreet Eleven</strong> to jednoosobowe studio. Voxpolia powstaje
+              w całości tutaj — od kodu, przez fizykę, po każdy model.
+            </p>
+            <p class="signature" data-i18n="studio.sign">— solo dev, ES11</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT ──────────────────────────────────────────────────────── -->
+      <section class="section section--contact" id="contact">
+        <div class="wrap contact-inner">
+          <p class="kicker reveal" data-i18n="contact.kicker">Kontakt</p>
+          <h2 class="h2 reveal" data-i18n="contact.h2">Śledź Voxpolię</h2>
+          <a class="contact-mail reveal" href="mailto:danielchecinski995@gmail.com"
+            >danielchecinski995@gmail.com</a
+          >
+          <div class="contact-links reveal">
+            <a href="#" rel="noopener">itch.io</a>
+            <a href="#" rel="noopener">Steam</a>
+            <a href="#" rel="noopener">YouTube</a>
+          </div>
+          <p class="note reveal" data-i18n="contact.note">Linki do sklepów i demo podłączymy przy premierze.</p>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>© <span id="year">2026</span> Endstreet Eleven · Voxpolia</span>
+        <span class="footer-mono">ES11</span>
+      </footer>
+    </main>
+
+    <noscript>
+      <div class="nojs">
+        <h1>Voxpolia</h1>
+        <p>Wokselowa strzelanka o burzeniu miasta. A voxel demolition shooter.</p>
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
