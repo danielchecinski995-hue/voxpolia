@@ -152,6 +152,13 @@ main { position: relative; z-index: 1; }
 .btn-primary { background: var(--gold); color: #1a1206; }
 .btn-primary:hover { background: #f4c53a; }
 .btn-ghost { color: var(--ink); border: 1px solid rgba(30, 22, 14, 0.28); }
+.btn-lg {
+  padding: 1.05rem 2.2rem;
+  font-size: 1.1rem;
+  box-shadow: 0 12px 30px rgba(176, 58, 34, 0.18);
+}
+.game-cta { margin-top: 2.5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.game-cta-note { color: var(--muted); font-size: 0.85rem; }
 .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
 
 /* ── Hero (transparent — shows the canvas) ──────────────────────────────── */

@@ -47,6 +47,8 @@ const DICT: Record<string, Entry> = {
   'game.f2': { pl: 'Całe miasto do zrównania z ziemią', en: 'A whole city to level' },
   'game.f3': { pl: 'Arsenał, który zmienia sposób burzenia', en: 'An arsenal that changes how you demolish' },
   'game.f4': { pl: 'Graj w przeglądarce — bez instalacji', en: 'Play in the browser — no install' },
+  'game.play': { pl: '▶ Zagraj w demo za darmo', en: '▶ Play the demo — free' },
+  'game.playnote': { pl: 'W przeglądarce, bez instalacji', en: 'In the browser, no install' },
 
   // ── arsenal ──────────────────────────────────────────────────────────────
   'arsenal.kicker': { pl: 'Arsenał', en: 'Arsenal' },
