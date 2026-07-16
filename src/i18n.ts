@@ -120,8 +120,8 @@ const DICT: Record<string, Entry> = {
   'contact.kicker': { pl: 'Kontakt', en: 'Contact' },
   'contact.h2': { pl: 'Śledź Voxpolię', en: 'Follow Voxpolia' },
   'contact.note': {
-    pl: 'Linki do sklepów i demo podłączymy przy premierze.',
-    en: 'Store and demo links go live at launch.',
+    pl: 'Demo grasz teraz w przeglądarce. Linki do sklepów podłączymy przy premierze.',
+    en: 'The demo is playable in the browser now. Store links go live at launch.',
   },
 
   // ── aria ─────────────────────────────────────────────────────────────────
