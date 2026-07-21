@@ -34,8 +34,23 @@ class WeaponViewer {
   private visible = false;
   private running = false;
   private prevT = 0;
+  private currentModel: THREE.Object3D | null = null;
+  private currentShadow: THREE.Mesh | null = null;
+  private currentUrl = '';
+  /** When set, the viewer uses a FIXED frame (never auto-scales to the model),
+   *  so different-sized models of one family show their TRUE relative size —
+   *  e.g. the C4 charge growing L1→L2→L3. */
+  private readonly fixedRadius: number | null;
+  private readonly fixedY: number;
 
-  constructor(private readonly canvas: HTMLCanvasElement, url: string) {
+  /** Render the model as a flat black silhouette (mystery/locked weapon). */
+  private readonly silhouette: boolean;
+
+  constructor(private readonly canvas: HTMLCanvasElement, url: string,
+    opts?: { fixedRadius?: number; fixedY?: number; silhouette?: boolean }) {
+    this.fixedRadius = opts?.fixedRadius ?? null;
+    this.fixedY = opts?.fixedY ?? 0.09;
+    this.silhouette = opts?.silhouette ?? false;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -69,9 +84,16 @@ class WeaponViewer {
     void this.load(url);
   }
 
-  private async load(url: string): Promise<void> {
+  /** Load (or swap to) a weapon model, disposing the previous one. Public so the
+   *  level switch can change the shown weapon per tier. No-op if already showing
+   *  `url`. */
+  async load(url: string): Promise<void> {
+    if (url === this.currentUrl) return;
+    this.currentUrl = url;
     try {
       const gltf = await new GLTFLoader().loadAsync(url);
+      if (url !== this.currentUrl) return; // a newer switch superseded this load
+      this.clearModel();
       const model = gltf.scene;
       // Frame: center the model, sit it on y=0, set orbit radius from its size.
       const box = new THREE.Box3().setFromObject(model);
@@ -79,13 +101,48 @@ class WeaponViewer {
       const center = box.getCenter(new THREE.Vector3());
       model.position.sub(center); // recenter to origin
       model.position.y += size.y / 2; // sit base on the floor (y=0)
+      if (this.silhouette) {
+        // Mystery weapon: paint every surface flat near-black so only the
+        // shape reads — a teasing black silhouette.
+        const black = new THREE.MeshBasicMaterial({ color: 0x141210 });
+        model.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) m.material = black; });
+      }
       this.scene.add(model);
-      this.target.set(0, size.y * 0.5, 0);
-      this.radius = Math.max(size.x, size.y, size.z) * 2.1 || 4;
-      this.scene.add(this.makeContactShadow(Math.max(size.x, size.z) * 0.9));
+      this.currentModel = model;
+      if (this.fixedRadius != null) {
+        // Fixed frame: same camera for every model, so a bigger model looks
+        // bigger (the whole point for the C4 charge size progression).
+        this.target.set(0, this.fixedY, 0);
+        this.radius = this.fixedRadius;
+      } else {
+        this.target.set(0, size.y * 0.5, 0);
+        this.radius = Math.max(size.x, size.y, size.z) * 2.1 || 4;
+      }
+      this.currentShadow = this.makeContactShadow(Math.max(size.x, size.z) * 0.9);
+      this.scene.add(this.currentShadow);
       this.renderOnce();
     } catch (err) {
       console.error('[weaponViewer] load failed', url, err);
+    }
+  }
+
+  private clearModel(): void {
+    if (this.currentModel) {
+      this.scene.remove(this.currentModel);
+      this.currentModel.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.geometry) m.geometry.dispose();
+        const mat = m.material as THREE.Material | THREE.Material[] | undefined;
+        if (Array.isArray(mat)) mat.forEach((x) => x.dispose());
+        else mat?.dispose();
+      });
+      this.currentModel = null;
+    }
+    if (this.currentShadow) {
+      this.scene.remove(this.currentShadow);
+      this.currentShadow.geometry.dispose();
+      (this.currentShadow.material as THREE.Material).dispose();
+      this.currentShadow = null;
     }
   }
 
@@ -179,26 +236,68 @@ class WeaponViewer {
   }
 }
 
-/** Fill the 5-pip stat bars from each bar's `data-fill` (0–5). */
-function mountWeaponStats(): void {
-  for (const bar of document.querySelectorAll<HTMLElement>('.wstat-bar[data-fill]')) {
-    const fill = Math.max(0, Math.min(5, Number(bar.dataset.fill) || 0));
-    bar.replaceChildren();
-    for (let i = 0; i < 5; i++) {
-      const pip = document.createElement('span');
-      if (i < fill) pip.className = 'on';
-      bar.appendChild(pip);
-    }
+/** Render a 5-pip stat bar to `fill` (0–5). */
+function paintBar(bar: HTMLElement, fill: number): void {
+  const n = Math.max(0, Math.min(5, fill));
+  bar.replaceChildren();
+  for (let i = 0; i < 5; i++) {
+    const pip = document.createElement('span');
+    if (i < n) pip.className = 'on';
+    bar.appendChild(pip);
   }
 }
 
-/** Boot every arsenal weapon canvas + its stat bars. Call after DOM is ready. */
+/** Resolve a stored-relative model path against the document so it survives a
+ *  hosting subpath (GitHub Pages serves at /<repo>/). */
+function resolveModel(rel: string): string { return new URL(rel, document.baseURI).href; }
+
+/**
+ * Boot every arsenal card: a 3D viewer + a LEVEL switch that changes BOTH the
+ * stats (they grow with level — never a single maxed-out bar) AND the shown
+ * weapon model (`data-models` per tier). One-level weapons get no buttons.
+ */
 export function mountArsenal(): void {
-  mountWeaponStats();
-  for (const canvas of document.querySelectorAll<HTMLCanvasElement>('canvas.weapon-canvas')) {
-    const rel = canvas.dataset.model;
-    // Resolve against the document so the GLB path survives a hosting subpath
-    // (GitHub Pages serves at /<repo>/); data-model is stored relative.
-    if (rel) new WeaponViewer(canvas, new URL(rel, document.baseURI).href);
+  for (const card of document.querySelectorAll<HTMLElement>('.weapon')) {
+    let stats: Record<string, number[]> = {};
+    try { stats = JSON.parse(card.dataset.stats ?? '{}'); } catch { /* leave empty */ }
+    let models: Record<string, string> | null = null;
+    try { models = card.dataset.models ? JSON.parse(card.dataset.models) : null; } catch { models = null; }
+
+    const levels = Object.keys(stats).sort();
+    const bars = [...card.querySelectorAll<HTMLElement>('.wstat-bar')];
+    const box = card.querySelector<HTMLElement>('.wlevels');
+    const canvas = card.querySelector<HTMLCanvasElement>('canvas.weapon-canvas');
+    const base = levels[0] ?? '1';
+
+    const firstModel = models?.[base] ?? canvas?.dataset.model;
+    // Optional fixed frame (e.g. C4): show TRUE relative sizes across levels.
+    const fr = card.dataset.frameRadius ? Number(card.dataset.frameRadius) : undefined;
+    const sil = card.dataset.silhouette === '1';
+    const viewer = canvas && firstModel
+      ? new WeaponViewer(canvas, resolveModel(firstModel), (fr || sil) ? { fixedRadius: fr, silhouette: sil } : undefined)
+      : null;
+
+    const show = (lvl: string): void => {
+      const vals = stats[lvl] ?? [];
+      bars.forEach((bar, i) => paintBar(bar, vals[i] ?? 0));
+      box?.querySelectorAll('.wlvl-btn').forEach((b) => {
+        b.classList.toggle('is-on', (b as HTMLElement).dataset.lvl === lvl);
+      });
+      if (viewer && models?.[lvl]) void viewer.load(resolveModel(models[lvl]!));
+    };
+
+    if (box && levels.length > 1) {
+      box.replaceChildren();
+      for (const lvl of levels) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'wlvl-btn';
+        b.dataset.lvl = lvl;
+        b.textContent = `LVL ${lvl}`;
+        b.addEventListener('click', () => show(lvl));
+        box.appendChild(b);
+      }
+    }
+    show(base); // default to the base level (lowest stats, base model already loaded)
   }
 }

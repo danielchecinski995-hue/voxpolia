@@ -24,6 +24,7 @@ import { FlyingChunks } from '../engine/game/boss/FlyingChunks';
 import type { VoxelCollider, DebrisSink } from '../engine/game/boss/FlyingChunks';
 import { HitEffects } from '../engine/game/vfx/HitEffects';
 import { ArcRocket } from './arcRocket';
+import { HeroScenery } from './heroScenery';
 
 /** LVL-2 bazooka carve radius in world metres (game: base 4.32 × craterMul 1.4). */
 const ROCKET_RADIUS = 6.05;
@@ -55,6 +56,7 @@ export class LiveBuilding {
   private readonly rubble: Rubble;
   private readonly hitFx: HitEffects;
   private readonly rockets: ArcRocket;
+  private readonly scenery: HeroScenery;
   private readonly gen0 = generateSkyscraper(0, 0, FLOORS, ACCENT);
   private readonly cfg = this.gen0.config;
   private firstSpawn = true;
@@ -112,6 +114,9 @@ export class LiveBuilding {
     this.rockets = new ArcRocket(app.scene);
     this.buildLights();
     app.scene.add(this.makeGround());
+    // Static neighbourhood (grass, roads, sidewalks, trees, benches + looping
+    // cars) — decorative, no physics; only the main tower is destructible.
+    this.scenery = new HeroScenery(app.scene, window.innerWidth <= 720, halfW, halfD);
 
     // Listen on window, NOT the canvas: the canvas sits behind the DOM overlay
     // (z-index), so clicks in the hero area land on <main>, never the canvas.
@@ -174,9 +179,10 @@ export class LiveBuilding {
   }
 
   private makeGround(): THREE.Mesh {
+    // Grass — the neighbourhood sits on green; roads/sidewalks are laid on top.
     const g = new THREE.Mesh(
       new THREE.PlaneGeometry(800, 800),
-      new THREE.MeshLambertMaterial({ color: 0xc8c2b8 }),
+      new THREE.MeshLambertMaterial({ color: 0x6f9b4a }),
     );
     g.rotation.x = -Math.PI / 2;
     return g;
@@ -243,7 +249,6 @@ export class LiveBuilding {
     this.controller.update(dt);
     this.bigChunks.update(dt, this.flyingChunks);
     this.flyingChunks.update(dt);
-    this.rubble.decayTick(dt);
     if (!this.rebuilding) this.driveRubbleGravity(dt);
     // Upload the pile's dirty instances to the GPU — WITHOUT this, blocks that
     // rubble gravity just removed stay drawn (floating), and freshly settled
@@ -252,6 +257,7 @@ export class LiveBuilding {
     this.rubble.flushDirty();
     this.hitFx.update(dt);
     this.rockets.update(dt);
+    this.scenery.update(dt);
     this.building.cluster.flushUploads(REMESH_BUDGET);
 
     if (!this.reduced && !this.rebuilding) this.driveRegen(dt);
@@ -292,8 +298,8 @@ export class LiveBuilding {
     const portrait = window.innerWidth <= 720;
     // Portrait: pull back so the WHOLE tower is small enough to leave margins
     // above (hero copy) and below (controls) — nothing overlaps it.
-    const dist = portrait ? 150 : 66;
-    const camY = portrait ? this.center.y + 6 : this.center.y + 4;
+    const dist = portrait ? 205 : 66;
+    const camY = portrait ? this.center.y + 14 : this.center.y + 4;
     let sx = 0; let sy = 0;
     if (this.shake > 0) {
       this.shake = Math.max(0, this.shake - dt * 2.2);
@@ -309,7 +315,7 @@ export class LiveBuilding {
     if (portrait) {
       // Horizontally centered; aim above center so the tower sits in the lower
       // band with a gap under the hero copy and footroom above the controls.
-      _look.set(this.center.x, this.center.y * 1.7, this.center.z);
+      _look.set(this.center.x, this.center.y * 2.62, this.center.z);
     } else {
       // Pan the tower further RIGHT so it clears the hero copy.
       _fwd.subVectors(this.center, camera.position).normalize();

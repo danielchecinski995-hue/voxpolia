@@ -11,6 +11,7 @@
   --muted: #6d6357;
   --line: rgba(30, 22, 14, 0.14);
   --font: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bungee', 'Space Grotesk', system-ui, sans-serif;
   --wrap: 72rem;
 }
 
@@ -91,17 +92,8 @@ main { position: relative; z-index: 1; }
   backdrop-filter: blur(10px);
   border-bottom-color: var(--line);
 }
-.brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-.brand-mono {
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  background: var(--red);
-  color: #fff;
-  padding: 0.2rem 0.5rem;
-  border-radius: 3px;
-  font-size: 0.95rem;
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
-}
+.brand { display: flex; align-items: center; gap: 0.55rem; text-decoration: none; }
+.brand-mark { display: block; height: 34px; width: auto; }
 .brand-name { font-weight: 600; font-size: 0.95rem; letter-spacing: 0.02em; }
 .nav { display: flex; gap: clamp(0.75rem, 2vw, 1.75rem); }
 .nav a {
@@ -114,28 +106,60 @@ main { position: relative; z-index: 1; }
 .nav a:hover, .nav a:focus-visible { color: var(--gold); }
 
 /* Language toggle (PL / EN) */
-.lang-toggle {
-  display: inline-flex;
-  align-items: center;
+/* ── Language switch (dropdown built by i18n.ts from LANGS) ─────────────────── */
+.lang-switch { position: relative; display: inline-flex; margin-left: 0.35rem; }
+.lang-btn {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: transparent;
   border: 1px solid var(--line);
   border-radius: 999px;
-  overflow: hidden;
-  margin-left: 0.35rem;
-}
-.lang-btn {
-  background: transparent;
-  border: 0;
-  padding: 0.3rem 0.62rem;
+  padding: 0.3rem 0.6rem;
   font-family: inherit;
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--muted);
+  letter-spacing: 0.04em;
+  color: var(--ink);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
 }
-.lang-btn:hover { color: var(--ink); }
-.lang-btn.is-active { background: var(--ink); color: var(--bg); }
+.lang-btn:hover { border-color: var(--gold); }
+.lang-caret { font-size: 0.6rem; color: var(--muted); }
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  min-width: 11rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(30, 22, 14, 0.16);
+  padding: 0.35rem;
+  display: none;
+  z-index: 60;
+}
+.lang-switch.open .lang-menu { display: block; }
+.lang-item {
+  display: flex; align-items: center; gap: 0.55rem;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.5rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.lang-item:hover { background: var(--bg-2); }
+.lang-item[aria-current='true'] { background: var(--ink); color: var(--bg); }
+.lang-flag { font-size: 1.05rem; line-height: 1; }
+/* RTL (Arabic): flip the menu to the other edge. */
+:root[dir='rtl'] .lang-menu { right: auto; left: 0; }
+:root[dir='rtl'] .lang-item { text-align: right; }
 
 /* ── Buttons ────────────────────────────────────────────────────────────── */
 .btn {
@@ -182,14 +206,26 @@ main { position: relative; z-index: 1; }
   letter-spacing: 0.22em;
   text-transform: uppercase;
 }
-.hero-title {
-  font-size: clamp(2.6rem, 9vw, 6rem);
-  font-weight: 700;
-  line-height: 0.98;
-  letter-spacing: -0.02em;
-  text-shadow: 0 2px 26px rgba(255, 255, 255, 0.7);
+/* VOXPOLIA — the game name as the hero's main title, in the blocky display face. */
+.hero-wordmark {
+  font-family: var(--font-display);
+  font-weight: 400; /* Bungee has a single weight; its blocks carry the weight */
+  font-size: clamp(3rem, 11vw, 7rem);
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-shadow: 0 3px 0 rgba(176, 58, 34, 0.16), 0 8px 30px rgba(255, 255, 255, 0.6);
 }
-.hero-title .accent { color: var(--brick); }
+/* Punchline demoted to a bold tagline under the wordmark. */
+.hero-tagline {
+  font-size: clamp(1.5rem, 4.2vw, 2.7rem);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 20px rgba(255, 255, 255, 0.7);
+}
+.hero-tagline .accent { color: var(--brick); }
 .hero-sub {
   font-size: clamp(1rem, 2.2vw, 1.25rem);
   color: var(--muted);
@@ -197,6 +233,10 @@ main { position: relative; z-index: 1; }
 }
 .hero-sub strong { color: var(--ink); font-weight: 600; }
 .hero-cta { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 0.5rem; }
+/* "Install on your phone" — only meaningful on touch devices (opens the demo,
+   which is the actual installable PWA). Hidden on desktop. */
+.install-cta { display: none; }
+@media (hover: none) and (pointer: coarse) { .install-cta { display: inline-flex; } }
 .rotate-controls {
   position: absolute;
   bottom: 3.6rem;
@@ -277,6 +317,76 @@ main { position: relative; z-index: 1; }
 }
 .section--voxpolia { background: var(--bg-2); }
 .wrap { max-width: var(--wrap); margin: 0 auto; }
+
+/* ── O GRZE: two columns — copy left, live collapse showcase right ────────── */
+.game-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: center;
+}
+.collapse-showcase { margin: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+.cs-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  /* daylight stage behind the transparent canvas */
+  background: linear-gradient(180deg, #dfe7f0 0%, #eef0ec 58%, #e4ded2 100%);
+  box-shadow: 0 18px 44px rgba(30, 22, 14, 0.14);
+}
+.collapse-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.cs-badge {
+  position: absolute; top: 0.7rem; left: 0.7rem;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.28rem 0.6rem 0.28rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(20, 16, 12, 0.62);
+  color: #fff; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.cs-badge::before {
+  content: ''; width: 7px; height: 7px; border-radius: 50%;
+  background: #ff5252; box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.6);
+  animation: cs-pulse 1.8s ease-out infinite;
+}
+@keyframes cs-pulse { 0% { box-shadow: 0 0 0 0 rgba(255,82,82,.6); } 70%,100% { box-shadow: 0 0 0 7px rgba(255,82,82,0); } }
+.cs-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.cs-chip {
+  flex: 1 1 0; min-width: 84px;
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit; font-size: 0.9rem; font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.cs-chip:hover { color: var(--ink); }
+.cs-chip.is-on { color: #1a1206; }
+.cs-chip--bazooka.is-on { background: #ff7a3c; border-color: #ff7a3c; box-shadow: 0 6px 16px rgba(255, 122, 60, 0.3); }
+.cs-chip--gatling.is-on { background: #3fc4ec; border-color: #3fc4ec; box-shadow: 0 6px 16px rgba(63, 196, 236, 0.3); }
+.cs-chip--c4.is-on { background: #8ad63a; border-color: #8ad63a; box-shadow: 0 6px 16px rgba(138, 214, 58, 0.3); }
+.cs-levels { display: flex; gap: 0.4rem; }
+.cs-lvl {
+  padding: 0.32rem 0.7rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+.cs-lvl:hover { color: var(--ink); }
+.cs-lvl.is-on { color: #1a1206; background: var(--gold); border-color: transparent; }
+.cs-caption { color: var(--muted); font-size: 0.86rem; }
+
+@media (max-width: 860px) {
+  .game-grid { grid-template-columns: 1fr; }
+  .collapse-showcase { order: -1; } /* show the action first on narrow screens */
+}
 .kicker {
   color: var(--gold);
   font-size: 0.78rem;
@@ -431,7 +541,8 @@ main { position: relative; z-index: 1; }
   color: var(--muted);
   font-size: 0.85rem;
 }
-.footer-mono { font-weight: 700; letter-spacing: 0.1em; color: var(--brick); }
+.footer-mark { display: block; height: 26px; width: auto; opacity: 0.7; }
+.studio-logo { display: block; width: clamp(140px, 16vw, 190px); height: auto; margin-top: 1.6rem; }
 
 .nojs { position: fixed; inset: 0; display: grid; place-content: center; gap: 1rem; text-align: center; padding: 2rem; z-index: 10; }
 
@@ -514,8 +625,45 @@ main { position: relative; z-index: 1; }
 .weapon-name { font-size: 1.4rem; font-weight: 700; margin-top: 0.7rem; }
 .weapon-desc { color: var(--muted); margin-top: 0.5rem; font-size: 0.95rem; }
 
+/* Mystery / locked weapon — dark stage, black silhouette, big faded "?" */
+.weapon--mystery { border-color: rgba(30, 22, 14, 0.18); }
+.weapon-stage--mystery {
+  background:
+    radial-gradient(ellipse at 50% 120%, rgba(233, 184, 36, 0.14), transparent 60%),
+    linear-gradient(180deg, #efe9df, #e6dccb);
+}
+.mystery-q {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-family: var(--font-display, inherit);
+  font-size: 8rem; font-weight: 800; line-height: 1;
+  color: rgba(30, 22, 14, 0.06);
+  pointer-events: none;
+  z-index: 0;
+}
+.weapon-stage--mystery .weapon-canvas { position: relative; z-index: 1; }
+.weapon-tier--locked { background: #2a2620; color: var(--gold); }
+
 /* Weapon stats: labelled 5-pip bars (filled by weaponViewer.mountWeaponStats). */
-.wstats { margin-top: 1.1rem; display: grid; gap: 0.5rem; }
+/* Per-weapon level switch (stats grow with level) */
+.wlevels { display: flex; gap: 0.4rem; margin-top: 0.9rem; flex-wrap: wrap; }
+.wlvl-btn {
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font: inherit; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+.wlvl-btn:hover { color: var(--ink); }
+.wlvl-btn.is-on {
+  color: #1a1206;
+  background: linear-gradient(90deg, var(--brick), var(--gold));
+  border-color: transparent;
+}
+.wstats { margin-top: 0.9rem; display: grid; gap: 0.5rem; }
 .wstat { display: grid; grid-template-columns: 6.5rem 1fr; align-items: center; gap: 0.6rem; }
 .wstat-label {
   font-size: 0.78rem;
@@ -552,70 +700,22 @@ main { position: relative; z-index: 1; }
 .teaser:hover { transform: translateY(-4px); border-color: rgba(233, 184, 36, 0.5); }
 .teaser-glyph {
   position: relative;
-  display: block;
-  width: 46px; height: 46px;
-  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  width: 52px; height: 52px;
+  border-radius: 13px;
   margin-bottom: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 14px rgba(30, 22, 14, 0.14);
 }
+.teaser-glyph svg { width: 30px; height: 30px; }
+.teaser:hover .teaser-glyph { transform: translateY(-1px) rotate(-3deg); transition: transform 0.25s ease; }
 .teaser-title { font-size: 1.15rem; font-weight: 700; }
 .teaser-desc { color: var(--muted); margin-top: 0.45rem; font-size: 0.92rem; }
-/* Skyline that grows */
-.teaser-glyph--city {
-  background: linear-gradient(160deg, #b03a22, #6e2114);
-  overflow: hidden;
-}
-.teaser-glyph--city::before {
-  content: '';
-  position: absolute;
-  left: 8px; right: 8px; bottom: 8px;
-  height: 26px;
-  background:
-    linear-gradient(#e9b824, #e9b824) 0 100% / 7px 60% no-repeat,
-    linear-gradient(#f4efe8, #f4efe8) 11px 100% / 7px 100% no-repeat,
-    linear-gradient(#e9b824, #e9b824) 22px 100% / 7px 45% no-repeat;
-  animation: city-rise 2.6s ease-in-out infinite alternate;
-}
-@keyframes city-rise { from { opacity: 0.55; } to { opacity: 1; } }
-/* Arsenal: a slowly rotating gold marker */
-.teaser-glyph--arsenal {
-  background: linear-gradient(160deg, #b03a22, #6e2114);
-  overflow: hidden;
-}
-.teaser-glyph--arsenal::before {
-  content: '';
-  position: absolute;
-  inset: 12px;
-  background:
-    linear-gradient(var(--gold), var(--gold)) 50% 0 / 4px 100% no-repeat,
-    linear-gradient(var(--gold), var(--gold)) 0 50% / 100% 4px no-repeat;
-  animation: spin 4.5s linear infinite;
-}
-/* Co-op: two pulsing markers */
-.teaser-glyph--coop { background: linear-gradient(160deg, #2f2a24, #14100d); }
-.teaser-glyph--coop::before,
-.teaser-glyph--coop::after {
-  content: '';
-  position: absolute;
-  top: 50%; width: 14px; height: 14px;
-  margin-top: -7px;
-  border-radius: 50%;
-  animation: coop-pulse 1.8s ease-in-out infinite;
-}
-.teaser-glyph--coop::before { left: 10px; background: var(--gold); }
-.teaser-glyph--coop::after { right: 10px; background: var(--brick); animation-delay: 0.9s; }
-@keyframes coop-pulse { 0%, 100% { transform: scale(0.7); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
-/* Goal: a target */
-.teaser-glyph--goal { background: linear-gradient(160deg, #241a15, #14100d); }
-.teaser-glyph--goal::before {
-  content: '';
-  position: absolute;
-  inset: 9px;
-  border-radius: 50%;
-  border: 3px solid var(--gold);
-  box-shadow: 0 0 0 3px #14100d, 0 0 0 6px var(--brick);
-  animation: goal-throb 1.8s ease-in-out infinite;
-}
-@keyframes goal-throb { 0%, 100% { transform: scale(0.82); } 50% { transform: scale(1); } }
+/* Distinct tint per card so the row isn't monotone; icon in a light tone. */
+.teaser-glyph--city     { background: linear-gradient(155deg, #c8461f, #7d2413); color: #f7ede0; }
+.teaser-glyph--arsenal  { background: linear-gradient(155deg, #e0a52a, #b06a12); color: #201203; }
+.teaser-glyph--vehicles { background: linear-gradient(155deg, #3a6ea5, #1e3d63); color: #eaf1fa; }
+.teaser-glyph--goal     { background: linear-gradient(155deg, #2a2620, #14100d); color: var(--gold); }
 
 /* ── Studio ─────────────────────────────────────────────────────────────── */
 .studio-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(2rem, 5vw, 4rem); }
@@ -631,8 +731,22 @@ main { position: relative; z-index: 1; }
   .nav a { font-size: 0.85rem; }
   /* Phone: hero copy pinned to the top, the 3D tower sits UNDER it (the scene
      re-frames the building into the lower half — see liveBuilding portrait). */
-  .hero { justify-content: flex-start; padding-top: 5.5rem; }
-  .hero-inner { max-width: 100%; }
+  .hero { justify-content: flex-start; padding-top: 4rem; }
+  .hero-inner { max-width: 100%; gap: 0.6rem; }
+  .hero-wordmark { font-size: clamp(2.6rem, 15vw, 3.6rem); }
+  .hero-tagline { font-size: clamp(1.3rem, 6vw, 1.8rem); }
+  .hero-sub { font-size: 0.92rem; }
+  /* Stack the CTAs full-width so they never crowd or overlap on narrow phones
+     (side-by-side left only ~20px of slack — real Safari fonts overran it).
+     Compact them and give the ghost ones a frosted backing so the tower
+     framed below stays fully readable and never bleeds through the buttons. */
+  .hero-cta { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  .hero-cta .btn { justify-content: center; padding: 0.58rem 1rem; font-size: 0.9rem; }
+  .hero-cta .btn-ghost {
+    background: rgba(245, 241, 234, 0.82);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
   /* Smaller controls, tucked to the very bottom so they clear the tower. */
   .rotate-controls { bottom: 1.1rem; gap: 0.5rem; }
   .rot-btn { width: 38px; height: 38px; font-size: 0.85rem; }

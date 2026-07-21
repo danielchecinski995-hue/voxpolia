@@ -8,6 +8,7 @@ import { App, hasWebGL } from './core/app';
 import { LiveBuilding } from './scenes/liveBuilding';
 import { initI18n } from './i18n';
 import { mountArsenal } from './scenes/weaponViewer';
+import { mountCollapseShowcase } from './scenes/collapseShowcase';
 
 const canvas = document.getElementById('stage') as HTMLCanvasElement | null;
 const topbar = document.getElementById('topbar');
@@ -20,6 +21,9 @@ initI18n();
 
 // Interactive 3D weapon previews + stat bars in the arsenal section.
 if (hasWebGL()) mountArsenal();
+
+// Live "same tower, three weapons" collapse loop in the O GRZE section.
+if (hasWebGL()) mountCollapseShowcase();
 
 // Scroll-reveal: elements marked `.reveal` fade/slide in as they enter view.
 // Reduced-motion users get them shown immediately (no transition).
