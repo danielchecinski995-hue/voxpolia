@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
-# One-shot deploy to GitHub Pages: build, then force-push dist/ to the
-# `gh-pages` branch (Pages serves that branch's root). No workflow scope needed.
+# One-shot deploy to Cloudflare Pages: build, then push dist/ to the `endstreet`
+# Pages project — that's what serves endstreet.games (apex + www). GitHub Pages
+# is NOT the live host, so don't push there.
 #
-# Usage:  npm run deploy
+# Usage:  npm run deploy   (needs wrangler auth: `npx wrangler login`)
 set -euo pipefail
 
-REMOTE="https://github.com/danielchecinski995-hue/voxpolia.git"
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
-
 cd "$HERE"
+
 npm run build
 
-cd dist
-touch .nojekyll
-rm -rf .git
-git init -b gh-pages -q
-git add -A
-git -c user.email="danielchecinski995@gmail.com" -c user.name="Daniel" commit -qm "deploy $(git -C "$HERE" rev-parse --short HEAD 2>/dev/null || echo dist)"
-git push -f -q "$REMOTE" gh-pages
-rm -rf .git
+# --branch=main → PRODUCTION deployment (maps to endstreet.games); any other
+# branch would only get a preview *.pages.dev URL. --commit-dirty silences the
+# uncommitted-changes warning (we deploy the working tree on purpose).
+npx wrangler pages deploy dist --project-name=endstreet --branch=main --commit-dirty=true
 
-echo "Deployed → https://danielchecinski995-hue.github.io/voxpolia/"
+echo "Deployed → https://endstreet.games/"

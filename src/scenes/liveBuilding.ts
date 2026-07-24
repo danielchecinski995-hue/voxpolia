@@ -16,13 +16,14 @@
 import * as THREE from 'three';
 import type { App, UpdateCtx } from '../core/app';
 import { Building } from '../engine/game/building/Building';
-import { generateSkyscraper } from '../engine/game/building/cityBlocks';
+import { generateSkyscraper, generateHouse } from '../engine/game/building/cityBlocks';
 import { BuildingController } from '../engine/game/building/BuildingController';
 import { BigChunks } from '../engine/game/building/BigChunks';
 import { Rubble } from '../engine/game/building/Rubble';
 import { FlyingChunks } from '../engine/game/boss/FlyingChunks';
 import type { VoxelCollider, DebrisSink } from '../engine/game/boss/FlyingChunks';
 import { HitEffects } from '../engine/game/vfx/HitEffects';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { ArcRocket } from './arcRocket';
 import { HeroScenery } from './heroScenery';
 
@@ -35,6 +36,10 @@ const REGEN_DELAY = 4.5;
  *  fast and the collapse is snappy, unlike the 2.3M fine tower). */
 const FLOORS = 11;
 const ACCENT = 0x2980b9; // demo VIVID_ACCENTS blue
+/** Hero tower origin — set back from the front street, deeper into the grass,
+ *  with a driveway + parking lot filling the gap (see HeroScenery). */
+const TOWER_X = 0;
+const TOWER_Z = -8;
 /** Single lightweight building → finish the structural sweep in ONE frame
  *  instead of time-slicing it, so the collapse fires without the delay. */
 const SWEEP_BUDGET = 4_000_000;
@@ -57,7 +62,7 @@ export class LiveBuilding {
   private readonly hitFx: HitEffects;
   private readonly rockets: ArcRocket;
   private readonly scenery: HeroScenery;
-  private readonly gen0 = generateSkyscraper(0, 0, FLOORS, ACCENT);
+  private readonly gen0 = generateSkyscraper(TOWER_X, TOWER_Z, FLOORS, ACCENT);
   private readonly cfg = this.gen0.config;
   private firstSpawn = true;
   private readonly center = new THREE.Vector3();
@@ -114,9 +119,15 @@ export class LiveBuilding {
     this.rockets = new ArcRocket(app.scene);
     this.buildLights();
     app.scene.add(this.makeGround());
+    // Real game buildings as static (non-destructible) neighbours so the hero
+    // tower isn't alone — their footprints feed the scenery (sidewalks + tree
+    // avoidance). Only the main tower is wired to a controller / raycast.
+    const neighbours = this.spawnNeighbours();
     // Static neighbourhood (grass, roads, sidewalks, trees, benches + looping
     // cars) — decorative, no physics; only the main tower is destructible.
-    this.scenery = new HeroScenery(app.scene, window.innerWidth <= 720, halfW, halfD);
+    this.scenery = new HeroScenery(
+      app.scene, window.innerWidth <= 720, halfW, halfD, neighbours, this.center.x, this.center.z,
+    );
 
     // Listen on window, NOT the canvas: the canvas sits behind the DOM overlay
     // (z-index), so clicks in the hero area land on <main>, never the canvas.
@@ -127,16 +138,39 @@ export class LiveBuilding {
     const resetBtn = document.getElementById('btn-reset');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => { if (!this.rebuilding) this.rebuild(); });
+      // Tu NIE blokujemy touchstart — to zabiłoby syntetyczny click na iOS.
+      // Wystarczy zdjąć menu kontekstowe; resztę załatwia CSS.
+      resetBtn.addEventListener('contextmenu', (e) => e.preventDefault());
     }
     app.onUpdate(this.update);
   }
 
   // ── build / rebuild ───────────────────────────────────────────────────────
 
+  /** Build the game's real houses/towers as static decorative neighbours and
+   *  return their footprints (centre + half-extents) for the scenery. */
+  private spawnNeighbours(): Array<{ cx: number; cz: number; hw: number; hd: number }> {
+    const specs = [
+      generateSkyscraper(52, 2, 7, 0x8a8f98),      // steel tower across the side street
+      generateHouse(6, 34, 0xd8c9a6, 0x8a4a34),    // little house across the front street
+    ];
+    const foots: Array<{ cx: number; cz: number; hw: number; hd: number }> = [];
+    for (const gen of specs) {
+      const b = new Building(gen.config, gen.blocks);
+      this.app.scene.add(b.group);
+      const c = gen.config;
+      foots.push({
+        cx: c.originX ?? 0, cz: c.originZ ?? 0,
+        hw: (c.width * c.blockSize) / 2, hd: (c.depth * c.blockSize) / 2,
+      });
+    }
+    return foots;
+  }
+
   private spawnBuilding(): void {
     // Reuse the block list built at construction for the first tower; on regen
     // regenerate (the generator is deterministic, so it comes back identical).
-    const gen = this.firstSpawn ? this.gen0 : generateSkyscraper(0, 0, FLOORS, ACCENT);
+    const gen = this.firstSpawn ? this.gen0 : generateSkyscraper(TOWER_X, TOWER_Z, FLOORS, ACCENT);
     this.firstSpawn = false;
     this.building = new Building(gen.config, gen.blocks);
     this.app.scene.add(this.building.group);
@@ -176,6 +210,10 @@ export class LiveBuilding {
     const rim = new THREE.DirectionalLight(0xce5a30, 0.28);
     rim.position.set(40, 16, -25);
     this.app.scene.add(hemi, key, rim);
+    // Neutral IBL so the game's PBR GLB props (cars, streetlights) read
+    // properly instead of going dark. Voxel buildings use Lambert (unaffected).
+    const pmrem = new THREE.PMREMGenerator(this.app.renderer);
+    this.app.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   }
 
   private makeGround(): THREE.Mesh {
@@ -199,6 +237,14 @@ export class LiveBuilding {
     btn.addEventListener('pointerup', stop);
     btn.addEventListener('pointerleave', stop);
     btn.addEventListener('pointercancel', stop);
+    // iOS Safari: preventDefault na pointerdown NIE ubija gestu zaznaczania —
+    // przy dłuższym przytrzymaniu i tak wstaje lupa z uchwytami, mimo
+    // user-select: none w CSS (user 2026-07-23). Dopiero touchstart z
+    // { passive: false } blokuje gest u źródła; contextmenu zdejmuje dymek.
+    btn.addEventListener('touchstart', start, { passive: false });
+    btn.addEventListener('touchend', stop);
+    btn.addEventListener('touchcancel', stop);
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
   }
 
   private onDown = (e: PointerEvent): void => {
@@ -214,9 +260,12 @@ export class LiveBuilding {
     if (window.scrollY > window.innerHeight * 0.6) return;
     if (Math.hypot(e.clientX - this.downX, e.clientY - this.downY) > 12) return;
     if (performance.now() - this.downT > 500) return;
+    // NDC relative to the canvas box (right half on desktop), not the window —
+    // otherwise the aim is offset by the empty text column on the left.
+    const rect = this.app.renderer.domElement.getBoundingClientRect();
     this.ndc.set(
-      (e.clientX / window.innerWidth) * 2 - 1,
-      -(e.clientY / window.innerHeight) * 2 + 1,
+      ((e.clientX - rect.left) / rect.width) * 2 - 1,
+      -((e.clientY - rect.top) / rect.height) * 2 + 1,
     );
     this.ray.setFromCamera(this.ndc, this.app.camera);
     const hit = this.ray.intersectObjects(this.building.cluster.surfaceMeshes(), false)[0];
@@ -298,8 +347,20 @@ export class LiveBuilding {
     const portrait = window.innerWidth <= 720;
     // Portrait: pull back so the WHOLE tower is small enough to leave margins
     // above (hero copy) and below (controls) — nothing overlaps it.
-    const dist = portrait ? 205 : 66;
-    const camY = portrait ? this.center.y + 14 : this.center.y + 4;
+    // Desktop split: the canvas is only the right half (narrow aspect), so the
+    // tower is centred in its own panel — pull back a touch to fit it whole.
+    // Portret: 150 zamiast dawnych 205 (user 2026-07-23 — budynek był za daleko).
+    // Kamera schodzi niżej, a punkt patrzenia idzie WYŻEJ, więc mimo większej
+    // bryły wieża dalej siada w dolnym pasie kadru, pod tekstem hero.
+    const dist = portrait ? 132 : 82;
+    const camY = portrait ? this.center.y + 10 : this.center.y + 6;
+    // Fog is orientation-aware: landscape/desktop pulls it in close so the long
+    // streets recede into it (cars vanish/emerge); portrait pushes it out past
+    // the pulled-back camera (dist 205) so the tower doesn't get fogged away.
+    const fog = this.app.scene.fog as THREE.Fog | null;
+    // Mgła MUSI zaczynać się za wieżą, inaczej podjechanie kamery wpuszcza ją
+    // w zamglenie — dlatego near jedzie razem z dist.
+    if (fog) { fog.near = portrait ? 145 : 80; fog.far = portrait ? 260 : 150; }
     let sx = 0; let sy = 0;
     if (this.shake > 0) {
       this.shake = Math.max(0, this.shake - dt * 2.2);
@@ -315,12 +376,13 @@ export class LiveBuilding {
     if (portrait) {
       // Horizontally centered; aim above center so the tower sits in the lower
       // band with a gap under the hero copy and footroom above the controls.
-      _look.set(this.center.x, this.center.y * 2.62, this.center.z);
+      // Mniejszy mnożnik = kamera patrzy NIŻEJ = bryła jedzie W GÓRĘ kadru.
+      // 2.78 spychało ją tak nisko, że nad nią zostawał pas pustego nieba, a
+      // ulica pod nią wypadała poza dolną krawędź (user 2026-07-23).
+      _look.set(this.center.x, this.center.y * 2.12, this.center.z);
     } else {
-      // Pan the tower further RIGHT so it clears the hero copy.
-      _fwd.subVectors(this.center, camera.position).normalize();
-      _right.crossVectors(_fwd, _up).normalize();
-      _look.copy(this.center).addScaledVector(_right, -24);
+      // Desktop split: the canvas IS the right half, so centre the tower in it.
+      _look.copy(this.center);
     }
     camera.lookAt(_look);
   }

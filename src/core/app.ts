@@ -32,17 +32,20 @@ export class App {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
+      alpha: true, // transparent — the tower/grass sit over the page's cream bg
       powerPreference: 'high-performance',
     });
     // Cap DPR at 2 — retina past that is wasted fill rate (plan §6).
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    // Bright daylight backdrop (site is a light theme).
-    this.renderer.setClearColor(0xe8ecf1, 1);
+    // Transparent clear: no sky rectangle, so the right panel blends seamlessly
+    // into the cream page (no grey haze at the split seam).
+    this.renderer.setClearColor(0x000000, 0);
 
     this.scene = new THREE.Scene();
-    // Far range so the tower stays crisp even when pulled back for the phone
-    // portrait framing (dist ~150, front ~143); landscape (front ~36) unaffected.
-    this.scene.fog = new THREE.Fog(0xe8ecf1, 210, 620);
+    // Fade distant scenery into the page cream (matches --bg). Pulled in close
+    // so the long streets recede into fog and cars vanish into / emerge from it,
+    // while the hero tower (~72–90m from camera) stays crisp.
+    this.scene.fog = new THREE.Fog(0xf5f1ea, 80, 150);
 
     this.camera = new THREE.PerspectiveCamera(50, 1, 0.1, 500);
     this.camera.position.set(0, 34, 82);
@@ -86,8 +89,12 @@ export class App {
   }
 
   private onResize = (): void => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    // Size to the canvas's own CSS box, not the window — the hero canvas is
+    // only the right half on desktop (split layout), so window size would
+    // stretch the render horizontally.
+    const canvas = this.renderer.domElement;
+    const w = canvas.clientWidth || window.innerWidth;
+    const h = canvas.clientHeight || window.innerHeight;
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();

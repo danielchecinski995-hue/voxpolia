@@ -401,10 +401,11 @@ export class CollapseShowcase {
 
   /** Aim point on the camera-facing side: inset just behind the near face, then
    *  spread `lat` metres along screen-horizontal and set the height `y`. */
-  private aim(lat: number, y: number): THREE.Vector3 {
+  private aim(lat: number, y: number, depth = 1): THREE.Vector3 {
     _toCam.set(this.camera.position.x - this.center.x, 0, this.camera.position.z - this.center.z).normalize();
     _lat.crossVectors(_up, _toCam).normalize(); // world dir that reads as screen-horizontal
-    const inset = Math.min(this.halfW, this.halfD) * 0.55;
+    // `depth`: +1 = bliższa ściana (domyślnie), 0 = rdzeń, -1 = ściana z tyłu.
+    const inset = Math.min(this.halfW, this.halfD) * 0.55 * depth;
     return new THREE.Vector3(
       this.center.x + _toCam.x * inset + _lat.x * lat,
       y,
@@ -440,16 +441,29 @@ export class CollapseShowcase {
       this.burstT = 0;
       this.fireEnd = this.gatTotal * GATLING_INTERVAL + 0.6;
     } else {
-      // C4: charges around the base + mid → a straight-down pancake.
-      const plan: [number, number, number][] = [
-        [0.0, -0.55 * w, 3], [0.75, 0.55 * w, 3], [1.5, 0.0, 3],
-        [2.25, -0.32 * w, H * 0.42], [3.0, 0.32 * w, H * 0.42],
+      // C4 = ROBOTA MINERSKA, nie jeden huk (user 2026-07-23). Najpierw seria
+      // DROBNYCH ładunków schodzących z góry po bokach — budynek stoi i tylko
+      // się wyszczerbia; dopiero na końcu pierścień pełnej mocy w podstawie
+      // kładzie go pionowo. Wcześniej podstawa szła PIERWSZA, więc bryła
+      // pancakowała się w 2 s, a dwa ostatnie ładunki wybuchały nad pustym
+      // gruzowiskiem. Kolumny: [czas, bok, wysokość, głębokość, mnożnik promienia].
+      const SMALL = 0.42; // drobny ładunek — wyraźnie mniejszy krater niż finał
+      const plan: [number, number, number, number, number][] = [
+        [0.0, -0.50 * w, H * 0.82, 1, SMALL],
+        [1.0, 0.50 * w, H * 0.70, -1, SMALL],
+        [2.0, -0.50 * w, H * 0.56, -1, SMALL],
+        [3.0, 0.50 * w, H * 0.44, 1, SMALL],
+        [4.0, 0.0, H * 0.32, 0, SMALL],
+        // Finał: pierścień w podstawie, dookoła — TERAZ się kładzie.
+        [5.2, -0.55 * w, 3, 1, 1], [5.7, 0.55 * w, 3, -1, 1],
+        [6.2, -0.55 * w, 3, -1, 1], [6.7, 0.55 * w, 3, 1, 1],
+        [7.2, 0.0, 3, 0, 1],
       ];
-      for (const [at, lat, y] of plan) {
-        const t = this.aim(lat, y);
-        this.shots.push({ at, kind: 'c4', x: t.x, y: t.y, z: t.z, r: R_C4 * m });
+      for (const [at, lat, y, depth, rMul] of plan) {
+        const t = this.aim(lat, y, depth);
+        this.shots.push({ at, kind: 'c4', x: t.x, y: t.y, z: t.z, r: R_C4 * m * rMul });
       }
-      this.fireEnd = 4.2;
+      this.fireEnd = 7.9;
     }
   }
 
@@ -488,11 +502,14 @@ export class CollapseShowcase {
     const lat = (within * 2 - 1) * dir * this.halfW * 0.82;
     const ty = this.heightM * yFrac + (Math.random() - 0.5) * 2;
     const aimPt = this.aim(lat, ty);
-    // Shooter out front at the SAME height → horizontal shot. Then RAYCAST to the
-    // building surface so the tracer STOPS at the wall and carves the facade —
-    // no more beam flying through the walls.
-    _origin.copy(this.center).addScaledVector(_toCam, this.framingDist * 0.5);
-    _origin.y = ty;
+    // Shooter well OFF-SCREEN to one side (alternating per pass) so the tracers
+    // streak IN from beyond the frame edge — like the bazooka arriving from off
+    // the top. Then RAYCAST to the building surface so the tracer STOPS at the
+    // wall and carves the facade — no beam flying through the walls.
+    _origin.copy(this.center)
+      .addScaledVector(_toCam, this.framingDist * 0.15)
+      .addScaledVector(_lat, dir * this.framingDist * 0.95);
+    _origin.y = ty + 3;
     _dir.subVectors(aimPt, _origin).normalize();
     this.gatRay.set(_origin, _dir);
     this.gatRay.far = this.framingDist * 2;

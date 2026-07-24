@@ -58,23 +58,23 @@
           <p class="hero-tagline" data-i18n="hero.title" data-i18n-html>
             Zrównaj miasto <span class="accent">z ziemią.</span>
           </p>
-          <p class="hero-sub" data-i18n="hero.sub" data-i18n-html>
-            To nie animacja — to prawdziwa fizyka destrukcji.
-            <strong>Wyceluj myszką i kliknij — poleci rakieta.</strong>
-          </p>
+          <p class="hero-sub" data-i18n="hero.sub" data-i18n-html>Zero wyreżyserowanych animacji. Czysta fizyka, żywy budynek i <strong>rakieta gotowa do strzału.</strong></p>
           <div class="hero-cta">
-            <a class="btn btn-primary" href="https://grasz.endstreet.games/" target="_blank" rel="noopener" data-i18n="hero.cta1">Zagraj teraz</a>
-            <a class="btn btn-ghost" href="#arsenal" data-i18n="hero.cta2">Zobacz arsenał</a>
-            <a class="btn btn-ghost install-cta" href="https://grasz.endstreet.games/#install" target="_blank" rel="noopener" data-i18n="hero.install">📲 Zainstaluj na telefonie</a>
+            <a class="btn btn-primary" href="https://grasz.endstreet.games/" target="_blank" rel="noopener" data-i18n="hero.cta1">Zagraj za darmo w przeglądarce</a>
           </div>
+          <!-- Widoczne TYLKO na dotyku (CSS): uczciwe oczekiwania zamiast złej
+               oceny po fakcie; desktop nie widzi — konwersja bez zastrzeżeń. -->
+          <p class="mobile-note" data-i18n="hero.mobileNote">
+            Wsparcie mobilne jest eksperymentalne (testowane na iPhone 13).
+            Jeśli tnie — obniż jakość w pauzie gry.
+          </p>
         </div>
+        <!-- Strzałki obrotu stoją PRZY BOKACH budynku, na wysokości jego połowy
+             (user 2026-07-23); reset i podpowiedź zostają w kolumnie pod nim. -->
+        <button id="rot-left" class="rot-btn rot-btn--side" type="button" data-i18n-aria="aria.rotLeft" aria-label="Obróć budynek w lewo">◀</button>
+        <button id="rot-right" class="rot-btn rot-btn--side" type="button" data-i18n-aria="aria.rotRight" aria-label="Obróć budynek w prawo">▶</button>
         <div class="rotate-controls">
-          <button id="btn-reset" class="reset-btn" type="button" data-i18n="hero.reset">⟳ Reset budynku</button>
-          <div class="rotate-row">
-            <button id="rot-left" class="rot-btn" type="button" data-i18n-aria="aria.rotLeft" aria-label="Obróć budynek w lewo">◀</button>
-            <span class="rot-hint" data-i18n="hero.rotate">obróć</span>
-            <button id="rot-right" class="rot-btn" type="button" data-i18n-aria="aria.rotRight" aria-label="Obróć budynek w prawo">▶</button>
-          </div>
+          <button id="btn-reset" class="reset-btn" type="button" data-i18n-aria="aria.reset" aria-label="Reset budynku">⟳</button>
         </div>
 
         <p class="scrollhint" aria-hidden="true" data-i18n="hero.scroll">przewiń ↓</p>
@@ -85,21 +85,14 @@
         <div class="wrap game-grid">
           <div class="game-copy">
             <p class="kicker reveal" data-i18n="game.kicker">O grze</p>
-            <h2 class="h2 reveal" data-i18n="game.h2">Każdy budynek naprawdę leci w gruzy</h2>
-            <p class="lead reveal" data-i18n="game.lead">
-              Voxpolia to wokselowa strzelanka o destrukcji miasta. Wybij ścianę nośną, a
-              wszystko nad nią runie kaskadą — sekcja po sekcji, aż na ziemię.
-            </p>
+            <h2 class="h2 reveal" data-i18n="game.h2">Koniec z pancernymi ścianami. Zburz wszystko do ostatniej cegły.</h2>
+            <p class="lead reveal" data-i18n="game.lead">Voxpolia to strzelanka stworzona dla czystej satysfakcji z demolki. Wybierz filar nośny i obserwuj, jak wieżowiec składa się jak domek z kart. Poznaj pełną swobodę, w której każdy strzał trwale zmienia architekturę miasta.</p>
             <ul class="features reveal" role="list">
-              <li data-i18n="game.f1">Destrukcja oparta na realnym modelu konstrukcji</li>
-              <li data-i18n="game.f2">Całe miasto do zrównania z ziemią</li>
-              <li data-i18n="game.f3">Arsenał, który zmienia styl destrukcji</li>
-              <li data-i18n="game.f4">Graj w przeglądarce — bez instalacji</li>
+              <li data-i18n="game.f1">Fizyka bez ściemy. Gdy uderzasz w słaby punkt, sypie się cała konstrukcja.</li>
+              <li data-i18n="game.f2">Całe miasto na Twoją własność i do Twojej dyspozycji.</li>
+              <li data-i18n="game.f3">Arsenał z charakterem, oferujący szeroki wybór od precyzyjnych cięć po masową demolkę.</li>
+              <li data-i18n="game.f4">Zero pobierania i zero czekania. Klikasz i grasz od razu.</li>
             </ul>
-            <div class="game-cta reveal">
-              <a class="btn btn-primary btn-lg" href="https://grasz.endstreet.games/" target="_blank" rel="noopener" data-i18n="game.play">▶ Zagraj za darmo</a>
-              <span class="game-cta-note" data-i18n="game.playnote">W przeglądarce, bez instalacji</span>
-            </div>
           </div>
 
           <!-- Live "same tower, three weapons" collapse loop (see collapseShowcase.ts) -->
@@ -110,10 +103,36 @@
             </div>
             <div class="cs-chips" role="tablist" aria-label="Broń">
               <button class="cs-chip cs-chip--bazooka is-on" type="button" data-i18n="cs.bazooka">Bazooka</button>
-              <button class="cs-chip cs-chip--gatling" type="button" data-i18n="cs.gatling">Działko</button>
+              <button class="cs-chip cs-chip--gatling" type="button" data-i18n="cs.gatling">Minigun</button>
               <button class="cs-chip cs-chip--c4" type="button" data-i18n="cs.c4">C4</button>
             </div>
             <figcaption class="cs-caption" data-i18n="cs.caption">Ten sam budynek, trzy bronie — trzy różne efekty destrukcji.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- SYSTEM ZALICZANIA + SPRZĄTANIA ──────────────────────────────── -->
+      <section class="section section--cleanup" id="cleanup">
+        <div class="wrap game-grid game-grid--flip">
+          <div class="game-copy">
+            <p class="kicker reveal" data-i18n="cu.kicker">Zasada</p>
+            <h2 class="h2 reveal" data-i18n="cu.h2">Szybka akcja bez szukania niedobitków</h2>
+            <p class="lead reveal" data-i18n="cu.lead">Nie trać czasu na celowanie do pojedynczych cegieł. Gdy zrównasz z ziemią większość budynku, gra automatycznie sprząta teren, a Ty przechodzisz do kolejnego celu.</p>
+            <ul class="features reveal" role="list">
+              <li data-i18n="cu.f1">Żadnego dobijania ostatnich cegieł</li>
+              <li data-i18n="cu.f2">Gruz i resztki znikają same</li>
+              <li data-i18n="cu.f3">Teren zawsze zostaje pusty, gotowy na kolejny cel</li>
+            </ul>
+          </div>
+
+          <!-- Live: wyburzanie → zatrzask na 80% → wir → czysty grunt (cleanupShowcase.ts) -->
+          <figure class="cleanup-showcase reveal">
+            <div class="cu-stage">
+              <canvas class="cleanup-canvas" aria-label="Pokaz: budynek zaliczony jako zniszczony i sprzątnięty"></canvas>
+              <span class="cs-badge" data-i18n="cs.live">na żywo</span>
+              <span class="cu-verdict" data-i18n="cu.verdict">ZALICZONY</span>
+            </div>
+            <figcaption class="cs-caption" data-i18n="cu.caption">Próg osiągnięty! Teren został oczyszczony pod kolejną akcję.</figcaption>
           </figure>
         </div>
       </section>
@@ -136,9 +155,7 @@
               <div class="weapon-body">
                 <span class="weapon-tier" data-i18n="wpn.bazooka.tier">Poziomy 1–3</span>
                 <h3 class="weapon-name" data-i18n="wpn.bazooka.name">Bazooka</h3>
-                <p class="weapon-desc" data-i18n="wpn.bazooka.desc">
-                  Pojedynczy pocisk, ogromny krater.
-                </p>
+                <p class="weapon-desc" data-i18n="wpn.bazooka.desc">Klasyczna moc uderzeniowa. Wystrzel pocisk, zrób dużą wyrwę w elewacji i przełam strukturę budynku jednym trafieniem.</p>
                 <div class="wlevels"></div>
                 <div class="wstats">
                   <div class="wstat"><span class="wstat-label" data-i18n="stat.power">Siła</span><span class="wstat-bar"></span></div>
@@ -157,9 +174,7 @@
               <div class="weapon-body">
                 <span class="weapon-tier" data-i18n="wpn.gatling.tier">Poziomy 1–3</span>
                 <h3 class="weapon-name" data-i18n="wpn.gatling.name">Gatling</h3>
-                <p class="weapon-desc" data-i18n="wpn.gatling.desc">
-                  Grad pocisków, który wygryza konstrukcję.
-                </p>
+                <p class="weapon-desc" data-i18n="wpn.gatling.desc">Nieprzerwany strumień ołowiu. Precyzyjnie wygryzaj ściany i odcinaj całe piętra, dopóki konstrukcja nie straci równowagi.</p>
                 <div class="wlevels"></div>
                 <div class="wstats">
                   <div class="wstat"><span class="wstat-label" data-i18n="stat.power">Siła</span><span class="wstat-bar"></span></div>
@@ -178,9 +193,7 @@
               <div class="weapon-body">
                 <span class="weapon-tier" data-i18n="wpn.c4.tier">Poziomy 1–3</span>
                 <h3 class="weapon-name" data-i18n="wpn.c4.name">C4</h3>
-                <p class="weapon-desc" data-i18n="wpn.c4.desc">
-                  Podłóż ładunek dokładnie tam, gdzie chcesz.
-                </p>
+                <p class="weapon-desc" data-i18n="wpn.c4.desc">Sztuka kontrolowanej rozbiórki. Rozmieść ładunki w punktach krytycznych, wycofaj się i wykonaj widowiskową detonację.</p>
                 <div class="wlevels"></div>
                 <div class="wstats">
                   <div class="wstat"><span class="wstat-label" data-i18n="stat.power">Siła</span><span class="wstat-bar"></span></div>
@@ -200,9 +213,7 @@
               <div class="weapon-body">
                 <span class="weapon-tier weapon-tier--locked" data-i18n="wpn.mystery.tier">🔒 Broń ukryta</span>
                 <h3 class="weapon-name" data-i18n="wpn.mystery.name">???</h3>
-                <p class="weapon-desc" data-i18n="wpn.mystery.desc">
-                  Ukryta nagroda — jej moc to niespodzianka. Odblokujesz ją, gdy zniszczysz 60% miasta. A z bazooką, działkiem i C4 na maksymalnym poziomie wystarczy 40%.
-                </p>
+                <p class="weapon-desc" data-i18n="wpn.mystery.desc">Tajny projekt obronny. Osiągnij odpowiedni poziom zniszczeń miasta, aby odblokować narzędzie o ostatecznej sile rażenia.</p>
               </div>
             </li>
           </ul>
@@ -213,10 +224,8 @@
       <section class="section section--full" id="full">
         <div class="wrap">
           <p class="kicker reveal" data-i18n="full.kicker">W pełnej grze</p>
-          <h2 class="h2 reveal" data-i18n="full.h2">To dopiero pierwsza dzielnica</h2>
-          <p class="lead reveal" data-i18n="full.lead">
-            To, co niszczysz teraz, to wycinek świata Voxpolii.
-          </p>
+          <h2 class="h2 reveal" data-i18n="full.h2">Pierwsza dzielnica to dopiero początek</h2>
+          <p class="lead reveal" data-i18n="full.lead">To, co widzisz dzisiaj, jest zaledwie poligonem doświadczalnym. Sprawdź, dokąd zmierza Voxpolia.</p>
 
           <ul class="teasers" role="list">
             <li class="teaser reveal">
@@ -238,7 +247,7 @@
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 15v-2.2l1.7-.6L6.6 7.4A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4l1.9 4.8 1.7.6V15h-1.1a2.6 2.6 0 0 1-5 0H9.1a2.6 2.6 0 0 1-5 0H3zm4.3-4.4h9.4l-1.2-3a.6.6 0 0 0-.5-.4H9a.6.6 0 0 0-.5.4zM6.6 14.3a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4zm10.8 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z"/></svg>
               </span>
               <h3 class="teaser-title" data-i18n="full.i3.t">Pojazdy</h3>
-              <p class="teaser-desc" data-i18n="full.i3.d">Wsiądź za kierownicę i taranuj miasto.</p>
+              <p class="teaser-desc" data-i18n="full.i3.d">Taranuj i miażdż. Wsiądź za kierownicę ciężkiego sprzętu i wjeżdżaj w budynki z pełną prędkością.</p>
             </li>
             <li class="teaser reveal">
               <span class="teaser-glyph teaser-glyph--goal" aria-hidden="true">
@@ -256,22 +265,13 @@
         <div class="wrap studio-grid">
           <div>
             <p class="kicker reveal" data-i18n="studio.kicker">Studio</p>
-            <h2 class="h2 reveal" data-i18n="studio.h2">Kto to robi</h2>
+            <h2 class="h2 reveal" data-i18n="studio.h2">Kto za tym stoi?</h2>
             <img class="studio-logo reveal" src="endstreet-mark.svg" alt="Endstreet Studio" width="180" height="210" />
           </div>
           <div class="studio-body reveal">
-            <p data-i18n="studio.body" data-i18n-html>
-              <strong>Endstreet Studio</strong> to jednoosobowe studio — jedna osoba, jedna gra.
-              Voxpolia powstaje w całości tutaj: kod, fizyka, każdy model broni i budynku.
-              Bez zespołu, bez gotowego silnika — wszystko napisane od zera.
-            </p>
-            <p data-i18n="studio.body2">
-              Wszystko zaczęło się od jednej obsesji: destrukcja ma być prawdziwa, a nie gotową
-              animacją. Stąd autorska fizyka — ściany nośne, reakcje łańcuchowe, gruz liczony
-              woksel po wokselu — i gra, którą odpalasz wprost w przeglądarce. To dopiero pierwsza
-              dzielnica; przede mną całe miasto.
-            </p>
-            <p class="signature" data-i18n="studio.sign">— solo dev, Endstreet</p>
+            <p data-i18n="studio.body" data-i18n-html>Za Voxpolią stoi jedna osoba i wielka pasja do tworzenia gier, w których destrukcja daje pełną swobodę.</p>
+            <p data-i18n="studio.body2">Autorski silnik, własna fizyka i każdy budynek wzniesiony od zera, bez skrótów czy gotowych szablonów. Wszystko powstało po to, aby dać Ci natychmiastową frajdę z demolki bezpośrednio w przeglądarce. Dzisiaj oddaję w Twoje ręce pierwszą dzielnicę, a całe miasto jest już w drodze.</p>
+            <p class="signature" data-i18n="studio.sign">— Endstreet Studio</p>
           </div>
         </div>
       </section>
@@ -288,6 +288,11 @@
             <a href="#" rel="noopener">itch.io</a>
           </div>
           <p class="note reveal" data-i18n="contact.note">Grasz teraz w przeglądarce. Linki do sklepów podłączymy przy premierze.</p>
+          <p class="note reveal" data-i18n="contact.perf">
+            Problem z wydajnością? Napisz, jaki masz telefon. Demo zbiera
+            anonimowe dane techniczne (model GPU, FPS) — bez identyfikatorów
+            i ciasteczek.
+          </p>
         </div>
       </section>
 

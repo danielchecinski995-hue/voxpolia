@@ -233,10 +233,9 @@ main { position: relative; z-index: 1; }
 }
 .hero-sub strong { color: var(--ink); font-weight: 600; }
 .hero-cta { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 0.5rem; }
-/* "Install on your phone" — only meaningful on touch devices (opens the demo,
-   which is the actual installable PWA). Hidden on desktop. */
-.install-cta { display: none; }
-@media (hover: none) and (pointer: coarse) { .install-cta { display: inline-flex; } }
+/* Zastrzeżenie mobilne: istnieje wyłącznie dla dotyku — desktop go nie widzi. */
+.mobile-note { display: none; font-size: 0.8rem; color: var(--muted); max-width: 30rem; }
+@media (hover: none) and (pointer: coarse) { .mobile-note { display: block; } }
 .rotate-controls {
   position: absolute;
   bottom: 3.6rem;
@@ -250,29 +249,27 @@ main { position: relative; z-index: 1; }
 }
 .rotate-row { display: flex; align-items: center; gap: 0.75rem; }
 .reset-btn {
-  padding: 0.55rem 1.1rem;
-  border-radius: 999px;
+  /* Sam symbol ⟳, bez podpisu (user 2026-07-23) — okrągły guzik jak strzałki. */
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
   border: 1px solid rgba(30, 22, 14, 0.22);
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(6px);
   color: var(--ink);
   font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 1.05rem;
+  line-height: 1;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, transform 0.1s, color 0.2s;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 .reset-btn:hover { border-color: var(--brick); color: var(--brick); }
 .reset-btn:active { transform: scale(0.96); background: rgba(176, 58, 34, 0.12); }
-.rot-hint {
-  color: var(--muted);
-  font-size: 0.72rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
 .rot-btn {
   width: 46px;
   height: 46px;
@@ -288,7 +285,23 @@ main { position: relative; z-index: 1; }
   transition: border-color 0.2s, background 0.2s, transform 0.1s;
   touch-action: none;
   user-select: none;
+  /* iOS: bez tych dwóch przytrzymanie strzałki zaznacza glif i wyskakuje
+     dymek „skopiuj/wyszukaj" (user 2026-07-23). `user-select` sam nie wystarcza
+     — Safari potrzebuje prefiksowanej wersji ORAZ wyłączenia callouta. */
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
+/* Strzałki obrotu przy BOKACH bryły, na wysokości jej połowy. Kotwiczą się do
+   .hero (a nie do kolumny z resetem), więc zostają przy krawędziach ekranu
+   niezależnie od tego, gdzie scena ustawi budynek. */
+.rot-btn--side {
+  position: absolute;
+  top: 62%;                 /* telefon: wieża siedzi w dolnym pasie kadru */
+  transform: translateY(-50%);
+  z-index: 3;
+}
+#rot-left { left: 0.9rem; }
+#rot-right { right: 0.9rem; }
 .rot-btn:hover { border-color: var(--gold); color: var(--gold); }
 .rot-btn:active { transform: scale(0.94); background: rgba(200, 153, 26, 0.18); }
 
@@ -383,9 +396,40 @@ main { position: relative; z-index: 1; }
 .cs-lvl.is-on { color: #1a1206; background: var(--gold); border-color: transparent; }
 .cs-caption { color: var(--muted); font-size: 0.86rem; }
 
+/* ── ZASADA: werdykt „zaliczony" + wir sprzątający ────────────────────────── */
+.game-grid--flip { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+.game-grid--flip .game-copy { order: 2; }
+.cleanup-showcase { margin: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+.cu-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  /* Ciemniejsza góra niż w pokazie broni — sylwetka wiru musi się odciąć od tła. */
+  background: linear-gradient(180deg, #c3d0de 0%, #dfe4e4 55%, #e4ded2 100%);
+  box-shadow: 0 18px 44px rgba(30, 22, 14, 0.14);
+}
+.cleanup-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Werdykt — wskakuje w chwili przebicia progu i zostaje do końca cyklu. */
+.cu-verdict {
+  position: absolute; top: 0.7rem; right: 0.7rem;
+  padding: 0.28rem 0.62rem; border-radius: 999px;
+  background: var(--gold); color: #1a1206;
+  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  opacity: 0; transform: scale(0.85);
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+}
+.cu-verdict.is-on { opacity: 1; transform: scale(1); }
+@media (prefers-reduced-motion: reduce) {
+  .cu-verdict { transition: none; }
+}
+
 @media (max-width: 860px) {
   .game-grid { grid-template-columns: 1fr; }
   .collapse-showcase { order: -1; } /* show the action first on narrow screens */
+  .game-grid--flip .game-copy { order: 0; }
+  .cleanup-showcase { order: -1; }
 }
 .kicker {
   color: var(--gold);
@@ -723,12 +767,42 @@ main { position: relative; z-index: 1; }
 .studio-body strong { color: var(--ink); }
 .studio-body .signature { color: var(--brick); font-weight: 600; margin-top: 1.5rem; }
 
+/* ── Desktop split hero ──────────────────────────────────────────────────
+   Hero is 50/50: copy on the LEFT (clean page background), the destructible
+   tower rendered into the RIGHT half only. Podział ma być OSTRYM CIĘCIEM
+   (user 2026-07-23) — wcześniej lewa krawędź kanwy była wypiórkowana maską
+   gradientową i scena rozmywała się w tło jak mgła. */
+@media (min-width: 721px) {
+  #stage {
+    left: auto;
+    right: 0;
+    width: 50vw;
+  }
+  /* Text column is capped to the left half AND made a container, so the
+     wordmark can size to the COLUMN width (cqi) instead of the viewport —
+     otherwise VOXPOLIA (one long word, no wrap) overflows right onto the
+     tower as the window narrows. */
+  .hero-inner {
+    max-width: min(44rem, 46vw);                       /* never crosses midline */
+    container-type: inline-size;
+  }
+  .hero-wordmark { font-size: 12cqi; }                 /* always fits the column */
+  .rotate-controls { left: 75%; }                      /* centred under the tower */
+  /* Desktop: kanwa to prawa połowa, więc lewa strzałka siada tuż za linią
+     podziału, a nie przy krawędzi ekranu (tam byłaby na tekście). */
+  .rot-btn--side { top: 52%; }
+  #rot-left { left: calc(50% + 1.25rem); }
+  #rot-right { right: 1.25rem; }
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 720px) {
   .studio-grid { grid-template-columns: 1fr; }
   .nav { gap: 0.75rem; }
   .brand-name { display: none; }
-  .nav a { font-size: 0.85rem; }
+  /* Telefon: linki sekcji znikają (user 2026-07-23) — zawijały się w dwie
+     linie i zjadały górę ekranu tuż nad hero. Przełącznik języka zostaje. */
+  .nav a { display: none; }
   /* Phone: hero copy pinned to the top, the 3D tower sits UNDER it (the scene
      re-frames the building into the lower half — see liveBuilding portrait). */
   .hero { justify-content: flex-start; padding-top: 4rem; }
@@ -747,11 +821,11 @@ main { position: relative; z-index: 1; }
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
   }
-  /* Smaller controls, tucked to the very bottom so they clear the tower. */
-  .rotate-controls { bottom: 1.1rem; gap: 0.5rem; }
+  /* Reset ląduje NAD budynkiem (user 2026-07-23), w pasie nieba między
+     przyciskiem CTA a szczytem wieży — na dole wchodził na bryłę i ulicę. */
+  .rotate-controls { top: 45%; bottom: auto; gap: 0.5rem; }
   .rot-btn { width: 38px; height: 38px; font-size: 0.85rem; }
-  .reset-btn { padding: 0.4rem 0.85rem; font-size: 0.66rem; }
-  .rot-hint { font-size: 0.64rem; }
+  .reset-btn { width: 38px; height: 38px; font-size: 0.9rem; }
   .scrollhint { display: none; } /* would collide with the controls */
 
   /* Light scroll lock: the hero softly snaps into place, so it's a bit harder
