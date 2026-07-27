@@ -794,6 +794,10 @@ main { position: relative; z-index: 1; }
     container-type: inline-size;
   }
   .hero-wordmark { font-size: 12cqi; }                 /* always fits the column */
+  /* Logo-obrazek nie zna cqi-fontu — twardy sufit: połowa okna minus lewy
+     padding hero minus odstęp, żeby NIGDY nie wjechał na kanwę wieżowca
+     (user 2026-07-27: „wpycha się na drugą stronę"). */
+  .hero-wordmark img { width: min(100%, 620px, calc(50vw - clamp(1rem, 5vw, 4rem) - 1.5rem)); }
   .rotate-controls { left: 75%; }                      /* centred under the tower */
   /* Desktop: kanwa to prawa połowa, więc lewa strzałka siada tuż za linią
      podziału, a nie przy krawędzi ekranu (tam byłaby na tekście). */
