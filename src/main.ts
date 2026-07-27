@@ -20,6 +20,14 @@ if (year) year.textContent = String(new Date().getFullYear());
 // Language toggle (PL/EN) + initial content.
 initI18n();
 
+// Notka „najlepsza wydajność w Chrome/Edge" — TYLKO poza Chromium
+// (user 2026-07-27): Chrome'owi nie robimy szumu przy CTA.
+interface UAData { brands?: Array<{ brand: string }> }
+const uaBrands = (navigator as Navigator & { userAgentData?: UAData }).userAgentData?.brands;
+const isChromium = uaBrands?.some((b) => /Chromium/i.test(b.brand))
+  ?? /Chrome\/|Chromium\/|Edg\//.test(navigator.userAgent);
+if (!isChromium) document.querySelector('.browser-note')?.classList.add('show');
+
 // Interactive 3D weapon previews + stat bars in the arsenal section.
 if (hasWebGL()) mountArsenal();
 

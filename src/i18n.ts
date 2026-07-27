@@ -260,6 +260,18 @@ const DICT: Record<string, Entry> = {
     ko: '모바일 지원은 실험 단계입니다(iPhone 13에서 테스트). 끊기면 일시정지 메뉴에서 품질을 낮추세요.',
     ja: 'モバイル対応は実験的です（iPhone 13 で検証）。カクつく場合はポーズメニューで画質を下げてください。',
   },
+  'hero.browserNote': {
+    en: 'Best performance in Chrome or Edge.',
+    pl: 'Najlepsza wydajno\u015b\u0107 w Chrome lub Edge.',
+    zh: '\u5728 Chrome \u6216 Edge \u4e2d\u6027\u80fd\u6700\u4f73\u3002',
+    es: 'Mejor rendimiento en Chrome o Edge.',
+    hi: 'Chrome \u092f\u093e Edge \u092e\u0947\u0902 \u0938\u092c\u0938\u0947 \u0905\u091a\u094d\u091b\u093e \u092a\u094d\u0930\u0926\u0930\u094d\u0936\u0928\u0964',
+    ar: '\u0623\u0641\u0636\u0644 \u0623\u062f\u0627\u0621 \u0641\u064a Chrome \u0623\u0648 Edge.',
+    fr: 'Performances optimales sur Chrome ou Edge.',
+    pt: 'Melhor desempenho no Chrome ou Edge.',
+    ko: 'Chrome \ub610\ub294 Edge\uc5d0\uc11c \uac00\uc7a5 \uc798 \uc791\ub3d9\ud569\ub2c8\ub2e4.',
+    ja: 'Chrome \u307e\u305f\u306f Edge \u3067\u6700\u9ad8\u306e\u30d1\u30d5\u30a9\u30fc\u30de\u30f3\u30b9\u3092\u767a\u63ee\u3057\u307e\u3059\u3002',
+  },
   'contact.perf': {
     en: 'Performance issues? Tell us your phone model. The demo collects anonymous technical data (GPU model, FPS) \u2014 no identifiers, no cookies.',
     pl: 'Problem z wydajnością? Napisz, jaki masz telefon. Demo zbiera anonimowe dane techniczne (model GPU, FPS) \u2014 bez identyfikatorów i ciasteczek.',

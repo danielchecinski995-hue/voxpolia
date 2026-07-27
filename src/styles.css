@@ -242,6 +242,8 @@ main { position: relative; z-index: 1; }
 .hero-cta { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 0.5rem; }
 /* Zastrzeżenie mobilne: istnieje wyłącznie dla dotyku — desktop go nie widzi. */
 .mobile-note { display: none; font-size: 0.8rem; color: var(--muted); max-width: 30rem; }
+.browser-note { display: none; font-size: 0.8rem; color: var(--muted); max-width: 30rem; }
+.browser-note.show { display: block; }
 @media (hover: none) and (pointer: coarse) { .mobile-note { display: block; } }
 .rotate-controls {
   position: absolute;
@@ -790,7 +792,10 @@ main { position: relative; z-index: 1; }
      otherwise VOXPOLIA (one long word, no wrap) overflows right onto the
      tower as the window narrows. */
   .hero-inner {
-    max-width: min(44rem, 46vw);                       /* never crosses midline */
+    /* Twardy sufit: połowa okna minus padding hero minus odstęp — 46vw NIE
+       wystarczało, bo lewy padding (do 4rem) dopychał kolumnę za linię
+       podziału i dłuższe języki (PT/KO) wjeżdżały na wieżowiec (user 2026-07-27). */
+    max-width: min(44rem, calc(50vw - clamp(1rem, 5vw, 4rem) - 1.5rem));
     container-type: inline-size;
   }
   .hero-wordmark { font-size: 12cqi; }                 /* always fits the column */
@@ -804,6 +809,15 @@ main { position: relative; z-index: 1; }
   .rot-btn--side { top: 52%; }
   #rot-left { left: calc(50% + 1.25rem); }
   #rot-right { right: 1.25rem; }
+  /* RTL (arabski): układ lustrzany — tekst hero siada PO PRAWEJ (start
+     kierunku pisma), więc kanwa wieżowca przechodzi na LEWĄ połowę, a
+     strzałki obrotu lustrzą się razem z nią (user 2026-07-27: „arabski po
+     przeciwnej stronie" nachodził na wieżowiec). */
+  [dir='rtl'] #stage { left: 0; right: auto; }
+  [dir='rtl'] .hero-inner { margin-left: 0; margin-right: 0; }
+  [dir='rtl'] .rotate-controls { left: 25%; }
+  [dir='rtl'] #rot-left { left: 1.25rem; }
+  [dir='rtl'] #rot-right { right: calc(50% + 1.25rem); }
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────────── */
