@@ -217,6 +217,13 @@ main { position: relative; z-index: 1; }
   color: var(--ink);
   text-shadow: 0 3px 0 rgba(176, 58, 34, 0.16), 0 8px 30px rgba(255, 255, 255, 0.6);
 }
+/* Graficzne logo VOXPOLIA (obraz 4:1) w miejscu tekstu — cień wypalony w PNG. */
+.hero-wordmark img {
+  display: block;
+  width: min(100%, 620px);
+  height: auto;
+}
+
 /* Punchline demoted to a bold tagline under the wordmark. */
 .hero-tagline {
   font-size: clamp(1.5rem, 4.2vw, 2.7rem);
