@@ -77,6 +77,7 @@ const DICT: Record<string, Entry> = {
     ja: 'ブラウザで無料プレイ',
   },
   'hero.cta2': { en: 'See the arsenal', pl: 'Zobacz arsenał', zh: '查看武器库', es: 'Ver el arsenal', hi: 'शस्त्रागार देखें', ar: 'شاهد الترسانة', fr: "Voir l'arsenal", pt: 'Ver o arsenal', ko: '무기고 보기', ja: '武器庫を見る' },
+  'hero.itch': { en: 'Play on itch.io', pl: 'Zagraj na itch.io', zh: '在 itch.io 上玩', es: 'Juega en itch.io', hi: 'itch.io पर खेलें', ar: 'العب على itch.io', fr: 'Jouer sur itch.io', pt: 'Jogue no itch.io', ko: 'itch.io에서 플레이', ja: 'itch.ioでプレイ' },
   'hero.scroll': { en: 'scroll ↓', pl: 'przewiń ↓', zh: '向下滚动 ↓', es: 'desplaza ↓', hi: 'स्क्रॉल ↓', ar: 'مرّر ↓', fr: 'faites défiler ↓', pt: 'role ↓', ko: '스크롤 ↓', ja: 'スクロール ↓' },
 
   // ── game / features ──────────────────────────────────────────────────────
