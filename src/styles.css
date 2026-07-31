@@ -846,9 +846,21 @@ main { position: relative; z-index: 1; }
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
   }
-  /* Reset ląduje NAD budynkiem (user 2026-07-23), w pasie nieba między
-     przyciskiem CTA a szczytem wieży — na dole wchodził na bryłę i ulicę. */
-  .rotate-controls { top: 45%; bottom: auto; gap: 0.5rem; }
+  /* Reset POD prawą strzałką obrotu przy krawędzi (user 2026-07-31): drugi
+     przycisk CTA (itch.io) zabrał pas nieba na 45% i reset wjeżdżał na guzik. */
+  .rotate-controls {
+    top: calc(62% + 3.1rem); bottom: auto; left: auto; right: 0.9rem;
+    transform: none; gap: 0.5rem;
+  }
+  /* Notki pod CTA dostają mrożone tło jak btn-ghost — przy dwóch przyciskach
+     schodzą niżej i mogą stykać się ze szczytem wieży; bez tła ginęły. */
+  .mobile-note, .browser-note.show {
+    background: rgba(245, 241, 234, 0.82);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    padding: 0.45rem 0.65rem;
+    border-radius: 10px;
+  }
   .rot-btn { width: 38px; height: 38px; font-size: 0.85rem; }
   .reset-btn { width: 38px; height: 38px; font-size: 0.9rem; }
   .scrollhint { display: none; } /* would collide with the controls */
