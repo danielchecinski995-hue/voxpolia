@@ -852,9 +852,12 @@ main { position: relative; z-index: 1; }
     top: calc(62% + 3.1rem); bottom: auto; left: auto; right: 0.9rem;
     transform: none; gap: 0.5rem;
   }
-  /* Notki pod CTA dostają mrożone tło jak btn-ghost — przy dwóch przyciskach
-     schodzą niżej i mogą stykać się ze szczytem wieży; bez tła ginęły. */
-  .mobile-note, .browser-note.show {
+  /* Telefon = tylko główne CTA + notka Chrome/Edge (user 2026-07-31):
+     przycisk itch.io i notka „eksperymentalne" wydłużały kolumnę i teksty
+     wjeżdżały na wieżowiec. Itch zostaje na desktopie i w stopce. */
+  .hero-cta .btn-ghost { display: none; }
+  .mobile-note { display: none; }
+  .browser-note.show {
     background: rgba(245, 241, 234, 0.82);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
