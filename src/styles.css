@@ -835,27 +835,16 @@ main { position: relative; z-index: 1; }
   .hero-wordmark { font-size: clamp(2.6rem, 15vw, 3.6rem); }
   .hero-tagline { font-size: clamp(1.3rem, 6vw, 1.8rem); }
   .hero-sub { font-size: 0.92rem; }
-  /* Stack the CTAs full-width so they never crowd or overlap on narrow phones
-     (side-by-side left only ~20px of slack — real Safari fonts overran it).
-     Compact them and give the ghost ones a frosted backing so the tower
-     framed below stays fully readable and never bleeds through the buttons. */
+  /* Jedyne CTA (itch.io) na całą szerokość — compact, żeby wieżowiec pod
+     spodem został czytelny na wąskich telefonach. */
   .hero-cta { flex-direction: column; align-items: stretch; gap: 0.5rem; }
   .hero-cta .btn { justify-content: center; padding: 0.58rem 1rem; font-size: 0.9rem; }
-  .hero-cta .btn-ghost {
-    background: rgba(245, 241, 234, 0.82);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-  }
-  /* Reset POD prawą strzałką obrotu przy krawędzi (user 2026-07-31): drugi
-     przycisk CTA (itch.io) zabrał pas nieba na 45% i reset wjeżdżał na guzik. */
+  /* Reset POD prawą strzałką obrotu przy krawędzi (user 2026-07-31). */
   .rotate-controls {
     top: calc(62% + 3.1rem); bottom: auto; left: auto; right: 0.9rem;
     transform: none; gap: 0.5rem;
   }
-  /* Telefon = tylko główne CTA + notka Chrome/Edge (user 2026-07-31):
-     przycisk itch.io i notka „eksperymentalne" wydłużały kolumnę i teksty
-     wjeżdżały na wieżowiec. Itch zostaje na desktopie i w stopce. */
-  .hero-cta .btn-ghost { display: none; }
+  /* Telefon: bez notki „eksperymentalne" — wydłużała kolumnę (user 2026-07-31). */
   .mobile-note { display: none; }
   .browser-note.show {
     background: rgba(245, 241, 234, 0.82);
