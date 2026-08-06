@@ -579,9 +579,11 @@ main { position: relative; z-index: 1; }
   border-bottom: 2px solid transparent;
 }
 .contact-mail:hover { border-bottom-color: var(--gold); }
-.contact-links { display: flex; gap: 1.5rem; margin-top: 1.75rem; }
+.contact-links { display: flex; align-items: center; gap: 1.5rem; margin-top: 1.75rem; }
 .contact-links a { color: var(--muted); text-decoration: none; font-weight: 500; }
 .contact-links a:hover { color: var(--ink); }
+.contact-links .icon { display: block; }
+.contact-links .icon svg { display: block; width: 22px; height: 22px; }
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 .footer {
